@@ -1,0 +1,67 @@
+{
+  "_readme": "Business facts live here and nowhere else. The page, the hours table, the open/closed badge and the Google structured data all read this file, so changing a number here changes it everywhere at once.",
+
+  "name": "Jill's Diner",
+  "preview": true,
+  "url": "https://jills-diner.vercel.app",
+
+  "phone": "(812) 418-8970",
+  "phoneE164": "+18124188970",
+
+  "address": {
+    "street": "3005 N. National Road",
+    "city": "Columbus",
+    "state": "IN",
+    "zip": "47201",
+    "landmark": "Between Rural King and Disc Replay, in the old RadioShack spot."
+  },
+
+  "facebook": "https://www.facebook.com/profile.php?id=100063801211216",
+
+  "timezone": "America/Indiana/Indianapolis",
+  "hours": [
+    { "day": "Monday", "closed": true },
+    { "day": "Tuesday", "open": "06:00", "close": "14:00" },
+    { "day": "Wednesday", "open": "06:00", "close": "14:00" },
+    { "day": "Thursday", "open": "06:00", "close": "14:00" },
+    { "day": "Friday", "open": "06:00", "close": "14:00" },
+    { "day": "Saturday", "open": "07:00", "close": "12:45" },
+    { "day": "Sunday", "open": "08:00", "close": "12:45" }
+  ],
+
+  "letterboard": ["Welcome to", "our new home", "3005 N National Rd", "Coffee's on"],
+
+  "story": {
+    "title": "A Columbus diner since 1952",
+    "lede": "Since 1952 the names over the door have changed. The diner hasn't: eggs on the flattop, coffee in the pot, and regulars who know each other by name.",
+    "timeline": [
+      {
+        "year": "1952",
+        "title": "It starts on Seventh Street",
+        "text": "Gerald I. Davis, a Marine and World War II veteran, opens his grill at 421 Seventh Street, downtown."
+      },
+      {
+        "year": "1972",
+        "title": "Bennie and Carolyn",
+        "text": "After twenty years Davis sells to Bennie and Carolyn Stott, and the counter keeps going."
+      },
+      {
+        "year": "2004",
+        "title": "Sadie's, then Kramer's",
+        "text": "Sadie Cress takes over, followed by Joe and Debbie Kramer. New names over the door, same little diner."
+      },
+      {
+        "year": "2008",
+        "title": "It becomes Jill's",
+        "text": "Jill buys the diner in February 2008. It has been a family place ever since."
+      },
+      {
+        "year": "2025",
+        "title": "A new home on National Road",
+        "text": "After 73 years downtown, the diner packs up and reopens at 3005 N. National Road. Same diner, new address."
+      }
+    ]
+  },
+
+  "regulars": "Everybody eats here: first responders, construction crews, plumbers, retirees, Bible study groups, and families with little ones in tow."
+}

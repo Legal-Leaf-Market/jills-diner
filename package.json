@@ -1,0 +1,14 @@
+{
+  "name": "jills-diner",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Website for Jill's Diner, 3005 N. National Road, Columbus, Indiana.",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "node build.mjs",
+    "dev": "node build.mjs && node scripts/serve.mjs"
+  }
+}

@@ -1,0 +1,456 @@
+// Page templates. Plain template strings, no framework: the site is two static
+// pages and should stay easy for anyone to read and change.
+
+import { art, icon } from './icons.mjs';
+
+const DOW = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
+
+export const esc = (v) =>
+  String(v ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+// Curly apostrophes for anything a person reads. URLs and JSON-LD keep the
+// straight ones.
+const typo = (v) => String(v ?? '').replace(/'/g, '\u2019');
+const t = (v) => esc(typo(v));
+
+export function fmtTime(hhmm) {
+  const [h, m] = hhmm.split(':').map(Number);
+  const suffix = h >= 12 ? 'PM' : 'AM';
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return m ? `${h12}:${String(m).padStart(2, '0')} ${suffix}` : `${h12} ${suffix}`;
+}
+
+const range = (d) => (d.closed ? 'Closed' : `${fmtTime(d.open)} \u2013 ${fmtTime(d.close)}`);
+
+// Collapse consecutive days with identical hours: "Tuesday to Friday".
+export function hoursSummary(hours) {
+  const groups = [];
+  for (const d of hours) {
+    const key = range(d);
+    const last = groups[groups.length - 1];
+    if (last && last.key === key && !d.closed) last.days.push(d.day);
+    else groups.push({ key, days: [d.day] });
+  }
+  const open = groups.filter((g) => g.key !== 'Closed');
+  const closed = groups.filter((g) => g.key === 'Closed');
+  return [...open, ...closed].map((g) => ({
+    days: g.days.length > 1 ? `${g.days[0]} to ${g.days[g.days.length - 1]}` : g.days[0],
+    hours: g.key,
+  }));
+}
+
+const fullAddress = (a) => `${a.street}, ${a.city}, ${a.state} ${a.zip}`;
+const addressQuery = (a) => encodeURIComponent(`${a.street.replace(/\./g, '')}, ${a.city}, ${a.state} ${a.zip}`);
+
+export const links = (site) => ({
+  tel: `tel:${site.phoneE164}`,
+  google: `https://www.google.com/maps/dir/?api=1&destination=${addressQuery(site.address)}`,
+  apple: `https://maps.apple.com/?daddr=${addressQuery(site.address)}`,
+  embed: `https://www.google.com/maps?q=${addressQuery(site.address)}&z=15&output=embed`,
+});
+
+function jsonLd(site) {
+  const spec = [];
+  for (const d of site.hours) {
+    if (d.closed) continue;
+    const same = spec.find((s) => s.opens === d.open && s.closes === d.close);
+    if (same) same.dayOfWeek.push(d.day);
+    else spec.push({ '@type': 'OpeningHoursSpecification', dayOfWeek: [d.day], opens: d.open, closes: d.close });
+  }
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'Restaurant',
+    name: site.name,
+    url: `${site.url}/`,
+    image: `${site.url}/og.png`,
+    telephone: site.phoneE164,
+    priceRange: '$',
+    servesCuisine: ['American', 'Breakfast', 'Diner'],
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: site.address.street,
+      addressLocality: site.address.city,
+      addressRegion: site.address.state,
+      postalCode: site.address.zip,
+      addressCountry: 'US',
+    },
+    openingHoursSpecification: spec,
+    hasMenu: `${site.url}/menu/`,
+    sameAs: [site.facebook],
+  };
+  // "<" can never appear raw inside a script element.
+  return JSON.stringify(data).replace(/</g, '\\u003c');
+}
+
+// The letterboard: every letter is its own span with a tiny, repeatable
+// wobble, the way real press-in letters never sit perfectly straight.
+function letterboard(lines) {
+  const rand = (n) => {
+    const x = Math.sin(n * 12.9898) * 43758.5453;
+    return x - Math.floor(x);
+  };
+  return lines
+    .map((line, li) => {
+      const chars = [...typo(line).toUpperCase()]
+        .map((ch, ci) => {
+          if (ch === ' ') return '<span class="sp"></span>';
+          const n = li * 97 + ci * 13 + 7;
+          const dy = ((rand(n) - 0.5) * 2.4).toFixed(2);
+          const r = ((rand(n + 3) - 0.5) * 3.2).toFixed(2);
+          return `<span style="--dy:${dy}px;--r:${r}deg">${esc(ch)}</span>`;
+        })
+        .join('');
+      return `<p class="board-line">${chars}</p>`;
+    })
+    .join('');
+}
+
+const header = (site, base) => `
+<a class="skip-link" href="#main">Skip to content</a>
+<p class="announce"><a href="${base}#visit"><strong>We\u2019ve moved!</strong> <span class="announce-long">Find us at ${t(site.address.street)}, next to Rural King</span><span class="announce-short">Now at ${t(site.address.street)}</span> ${icon.arrow}</a></p>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/" aria-label="${t(site.name)}, home"><span class="brand-script">Jill\u2019s</span><span class="brand-block">Diner</span></a>
+    <nav class="site-nav" aria-label="Main">
+      <a href="#menu">Menu</a>
+      <a href="${base}#visit">Hours &amp; Directions</a>
+      <a href="${base}#story">Our Story</a>
+    </nav>
+    <a class="btn btn-red btn-sm header-call" href="${links(site).tel}">${icon.phone}<span>${esc(site.phone)}</span></a>
+  </div>
+</header>`;
+
+const statusBadge = () => `
+<p class="status" data-status>
+  <span class="status-dot" aria-hidden="true"></span>
+  <span class="status-text" data-status-text>Open Tuesday to Sunday. Closed Mondays.</span>
+</p>`;
+
+const hero = (site) => `
+<section class="hero" aria-labelledby="hero-title">
+  <div class="wrap hero-inner">
+    <div class="hero-copy">
+      <p class="eyebrow">Breakfast &amp; lunch <span aria-hidden="true">\u00b7</span> Columbus, Indiana</p>
+      <h1 class="wordmark" id="hero-title"><span class="wm-script">Jill\u2019s</span> <span class="wm-block">Diner</span></h1>
+      <p class="hero-lede">Biscuits and gravy, fried mush, a tenderloin at lunch and a hot cup of coffee. Now serving at our new home on National Road.</p>
+      ${statusBadge()}
+      <div class="hero-actions">
+        <a class="btn btn-red" href="#menu">${icon.menu}<span>See the menu</span></a>
+        <a class="btn btn-ink" href="${links(site).tel}">${icon.phone}<span>Call ${esc(site.phone)}</span></a>
+        <a class="btn btn-ghost" href="${links(site).google}" data-directions="${links(site).apple}" target="_blank" rel="noopener">${icon.pin}<span>Directions</span></a>
+      </div>
+    </div>
+    <div class="hero-art">
+      <svg class="starburst" viewBox="0 0 200 200" aria-hidden="true" focusable="false">${starburst()}</svg>
+      <figure class="board-frame" role="img" aria-label="Letter board sign: ${esc(typo(site.letterboard.join(', ')))}">
+        <div class="board">${letterboard(site.letterboard)}</div>
+      </figure>
+    </div>
+  </div>
+</section>`;
+
+function starburst(points = 18, tilt = 8) {
+  const pts = [];
+  for (let i = 0; i < points * 2; i++) {
+    const a = (i / (points * 2)) * Math.PI * 2 - Math.PI / 2 + (tilt * Math.PI) / 180;
+    const r = i % 2 === 0 ? 96 : 70;
+    pts.push(`${(100 + Math.cos(a) * r).toFixed(1)},${(100 + Math.sin(a) * r).toFixed(1)}`);
+  }
+  return `<polygon points="${pts.join(' ')}" fill="#F2C14E" stroke="#211C18" stroke-width="3" stroke-linejoin="round"/>`;
+}
+
+const favorites = (menu) => `
+<section class="favorites" aria-labelledby="fav-title">
+  <div class="wrap">
+    <header class="section-head">
+      <p class="kicker">What to order</p>
+      <h2 id="fav-title">House favorites</h2>
+    </header>
+    <ul class="fav-grid" role="list">
+      ${menu.favorites
+        .map(
+          (f) => `
+      <li class="fav-card">
+        <div class="fav-art">${art[f.icon] ?? ''}</div>
+        <h3>${t(f.name)}</h3>
+        <p>${t(f.text)}</p>
+      </li>`,
+        )
+        .join('')}
+    </ul>
+  </div>
+</section>`;
+
+function item(i) {
+  const price = i.price
+    ? `<span class="leader" aria-hidden="true"></span><span class="price">$${esc(String(i.price).replace(/^\$/, ''))}</span>`
+    : '';
+  return `
+          <li class="item">
+            <div class="item-top"><span class="item-name">${t(i.name)}</span>${i.tag ? ` <span class="tag">${t(i.tag)}</span>` : ''}${price}</div>
+            ${i.desc ? `<p class="item-desc">${t(i.desc)}</p>` : ''}
+          </li>`;
+}
+
+const menuCard = (menu, { standalone }) => `
+<div class="menu-card">
+  <nav class="menu-nav" aria-label="Jump to a part of the menu">
+    <ul role="list">
+      ${menu.sections.map((s) => `<li><a href="#m-${esc(s.id)}">${t(s.short ?? s.title)}</a></li>`).join('')}
+    </ul>
+  </nav>
+  <div class="menu-cols">
+    ${menu.sections
+      .map(
+        (s) => `
+    <section class="menu-group" id="m-${esc(s.id)}" aria-labelledby="m-${esc(s.id)}-h">
+      <h3 id="m-${esc(s.id)}-h">${t(s.title)}</h3>
+      ${s.note ? `<p class="group-note">${t(s.note)}</p>` : ''}
+      <ul class="items${s.layout === 'compact' ? ' items-compact' : ''}" role="list">${s.items.map(item).join('')}
+      </ul>
+    </section>`,
+      )
+      .join('')}
+  </div>
+  <div class="menu-foot">
+    <p>The menu changes now and then. If you\u2019re after something in particular, give us a call.</p>
+    ${
+      standalone
+        ? `<button class="btn btn-ghost btn-sm" type="button" data-print>${icon.print}<span>Print this menu</span></button>`
+        : `<a class="btn btn-ghost btn-sm" href="/menu/">${icon.print}<span>Printable menu</span></a>`
+    }
+  </div>
+</div>`;
+
+const menuSection = (site, menu) => `
+<section class="menu-section" id="menu" aria-labelledby="menu-title">
+  <div class="wrap">
+    <header class="section-head on-red">
+      <p class="kicker">Breakfast, lunch &amp; something sweet</p>
+      <h2 id="menu-title">The Menu</h2>
+    </header>
+    ${menuCard(menu, { standalone: false })}
+  </div>
+</section>`;
+
+const hoursTable = (site) => `
+<table class="hours-table">
+  <caption class="sr-only">Hours</caption>
+  <tbody>
+    ${site.hours
+      .map(
+        (d) =>
+          `<tr data-dow="${DOW[d.day]}"${d.closed ? ' class="is-closed"' : ''}><th scope="row">${esc(d.day)}</th><td>${range(d)}</td></tr>`,
+      )
+      .join('\n    ')}
+  </tbody>
+</table>`;
+
+const visit = (site) => {
+  const l = links(site);
+  return `
+<section class="visit" id="visit" aria-labelledby="visit-title">
+  <div class="wrap visit-grid">
+    <div class="visit-info">
+      <header class="section-head align-left">
+        <p class="kicker">Come see us</p>
+        <h2 id="visit-title">Find us on National Road</h2>
+      </header>
+      <p class="moved-note"><strong>We moved!</strong> After 73 years on Seventh Street downtown, the diner has a new home.</p>
+      <address class="address-card">
+        <span class="addr-street">${t(site.address.street)}</span>
+        <span class="addr-city">${t(site.address.city)}, ${esc(site.address.state)} ${esc(site.address.zip)}</span>
+        <span class="addr-landmark">${icon.car}<span>${t(site.address.landmark)}</span></span>
+      </address>
+      <div class="visit-actions">
+        <a class="btn btn-red" href="${l.google}" target="_blank" rel="noopener">${icon.pin}<span>Google Maps</span></a>
+        <a class="btn btn-ghost" href="${l.apple}" target="_blank" rel="noopener">${icon.pin}<span>Apple Maps</span></a>
+        <a class="btn btn-ink" href="${l.tel}">${icon.phone}<span>${esc(site.phone)}</span></a>
+      </div>
+      <div class="hours-block">
+        <h3>${icon.clock}<span>Hours</span></h3>
+        ${statusBadge()}
+        ${hoursTable(site)}
+      </div>
+    </div>
+    <div class="visit-map">
+      <a class="map-fallback" href="${l.google}" target="_blank" rel="noopener">${icon.pin}<span>${t(fullAddress(site.address))}</span><span class="btn btn-ghost btn-sm">Open the map</span></a>
+      <iframe title="Map showing ${esc(fullAddress(site.address))}" src="${l.embed}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+  </div>
+</section>`;
+};
+
+const story = (site) => `
+<section class="story" id="story" aria-labelledby="story-title">
+  <div class="wrap story-grid">
+    <header class="story-head">
+      <p class="kicker">Our story</p>
+      <h2 id="story-title">${t(site.story.title)}</h2>
+      <p class="story-lede">${t(site.story.lede)}</p>
+      <p class="story-regulars">${t(site.regulars)}</p>
+    </header>
+    <ol class="timeline" role="list">
+      ${site.story.timeline
+        .map(
+          (e) => `
+      <li>
+        <span class="year">${esc(e.year)}</span>
+        <div class="event">
+          <h3>${t(e.title)}</h3>
+          <p>${t(e.text)}</p>
+        </div>
+      </li>`,
+        )
+        .join('')}
+    </ol>
+  </div>
+</section>`;
+
+const footer = (site, base) => {
+  const l = links(site);
+  return `
+<section class="cta-band" aria-labelledby="cta-title">
+  <div class="wrap cta-inner">
+    <h2 id="cta-title"><span class="cta-script">Coffee\u2019s on.</span> Come on in.</h2>
+    <div class="cta-actions">
+      <a class="btn btn-ink" href="${l.google}" data-directions="${l.apple}" target="_blank" rel="noopener">${icon.pin}<span>Get directions</span></a>
+      <a class="btn btn-ghost" href="${l.tel}">${icon.phone}<span>${esc(site.phone)}</span></a>
+    </div>
+  </div>
+</section>
+<div class="checker" aria-hidden="true"></div>
+<footer class="site-footer">
+  <div class="wrap footer-grid">
+    <div class="foot-brand">
+      <a class="brand brand-light" href="/" aria-label="${t(site.name)}, home"><span class="brand-script">Jill\u2019s</span><span class="brand-block">Diner</span></a>
+      <p>${t(site.address.street)}<br>${t(site.address.city)}, ${esc(site.address.state)} ${esc(site.address.zip)}</p>
+      <p><a href="${l.tel}">${esc(site.phone)}</a></p>
+    </div>
+    <div>
+      <h2 class="foot-h">Hours</h2>
+      <ul class="foot-hours" role="list">
+        ${hoursSummary(site.hours)
+          .map((g) => `<li><span>${esc(g.days)}</span><span>${esc(g.hours)}</span></li>`)
+          .join('\n        ')}
+      </ul>
+    </div>
+    <div>
+      <h2 class="foot-h">Around here</h2>
+      <ul class="foot-links" role="list">
+        <li><a href="#menu">The menu</a></li>
+        <li><a href="/menu/">Printable menu</a></li>
+        <li><a href="${base}#story">Our story</a></li>
+        <li><a href="${esc(site.facebook)}" target="_blank" rel="noopener">${icon.facebook}<span>Jill\u2019s on Facebook</span></a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap foot-bottom">
+    <p>\u00a9 ${new Date().getFullYear()} ${t(site.name)}, Columbus, Indiana</p>
+    ${site.preview ? '<p class="preview-note">Preview site. Menu, prices and hours are still being confirmed with the diner.</p>' : ''}
+  </div>
+</footer>
+<nav class="action-bar" aria-label="Quick actions">
+  <a href="${l.tel}">${icon.phone}<span>Call</span></a>
+  <a href="${l.google}" data-directions="${l.apple}" target="_blank" rel="noopener">${icon.pin}<span>Directions</span></a>
+  <a href="#menu">${icon.menu}<span>Menu</span></a>
+</nav>`;
+};
+
+function page({ site, assets, path, title, description, body }) {
+  const canonical = `${site.url}${path}`;
+  const hoursData = JSON.stringify({
+    tz: site.timezone,
+    days: site.hours.map((d) => (d.closed ? { dow: DOW[d.day], closed: true } : { dow: DOW[d.day], open: d.open, close: d.close })),
+  });
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>${esc(title)}</title>
+<meta name="description" content="${esc(description)}">
+${site.preview ? '<meta name="robots" content="noindex, nofollow">\n' : ''}<link rel="canonical" href="${esc(canonical)}">
+<meta name="theme-color" content="#C2302A">
+<meta name="format-detection" content="telephone=no">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="${t(site.name)}">
+<meta property="og:title" content="${esc(title)}">
+<meta property="og:description" content="${esc(description)}">
+<meta property="og:url" content="${esc(canonical)}">
+<meta property="og:image" content="${esc(site.url)}/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Jill\u2019s Diner, now at ${esc(site.address.street)}, Columbus, Indiana">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preload" href="/fonts/libre-franklin-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/oswald-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/yellowtail-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/styles.css?v=${assets.css}">
+<script type="application/ld+json">${jsonLd(site)}</script>
+<script type="application/json" id="hours-data">${hoursData.replace(/</g, '\\u003c')}</script>
+<script src="/app.js?v=${assets.js}" defer></script>
+</head>
+${body}
+</html>
+`;
+}
+
+export function renderHome({ site, menu, assets }) {
+  return page({
+    site,
+    assets,
+    path: '/',
+    title: `${typo(site.name)} | Breakfast & Lunch in Columbus, Indiana`,
+    description: `Breakfast and lunch at ${site.address.street}, Columbus, Indiana: biscuits and gravy, fried mush, tenderloins, pie and hot coffee. Open Tuesday to Sunday.`,
+    body: `<body class="home">
+${header(site, '')}
+<main id="main">
+${hero(site)}
+<div class="checker" aria-hidden="true"></div>
+${favorites(menu)}
+${menuSection(site, menu)}
+${visit(site)}
+${story(site)}
+</main>
+${footer(site, '')}
+</body>`,
+  });
+}
+
+export function renderMenuPage({ site, menu, assets }) {
+  return page({
+    site,
+    assets,
+    path: '/menu/',
+    title: `Menu | ${typo(site.name)}, Columbus, Indiana`,
+    description: `The ${typo(site.name)} menu: breakfast specials, omelettes, pancakes, sandwiches, homestyle plates, pie and shakes. ${site.address.street}, Columbus, Indiana.`,
+    body: `<body class="menu-page">
+${header(site, '/')}
+<main id="main">
+<section class="menu-section" id="menu" aria-labelledby="menu-title">
+  <div class="wrap">
+    <header class="section-head on-red">
+      <p class="kicker">Breakfast, lunch &amp; something sweet</p>
+      <h1 id="menu-title">The Menu</h1>
+      <p class="menu-page-sub"><span>${t(site.address.street)}, ${t(site.address.city)}</span> <span class="sub-dot" aria-hidden="true">\u00b7</span> <a href="${links(site).tel}">${esc(site.phone)}</a></p>
+    </header>
+    <div class="print-head" aria-hidden="true">
+      <p class="print-name">Jill\u2019s Diner</p>
+      <p>${t(fullAddress(site.address))} \u00b7 ${esc(site.phone)}</p>
+      <p>${hoursSummary(site.hours).map((g) => `${esc(g.days)}: ${esc(g.hours)}`).join(' \u00b7 ')}</p>
+    </div>
+    ${menuCard(menu, { standalone: true })}
+  </div>
+</section>
+</main>
+${footer(site, '/')}
+</body>`,
+  });
+}

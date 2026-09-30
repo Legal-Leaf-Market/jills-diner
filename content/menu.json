@@ -1,0 +1,167 @@
+{
+  "_readme": "The whole menu. Add, remove or rename items here and redeploy. Every item takes an optional \"desc\" (one short line), \"tag\" (a small badge like \"Regulars' pick\") and \"price\" (just the number, like \"6.49\"). Prices are left off until Jill confirms the current ones; the page shows a price only when one is filled in.",
+
+  "favorites": [
+    {
+      "icon": "biscuits",
+      "name": "Biscuits & Gravy",
+      "text": "Warm biscuits under a blanket of gravy. A regulars' favorite for years."
+    },
+    {
+      "icon": "mush",
+      "name": "Fried Mush",
+      "text": "Cornmeal mush, sliced and fried golden. Hard to find anywhere else these days."
+    },
+    {
+      "icon": "big",
+      "name": "Jill's BIG Breakfast",
+      "text": "For the mornings you walk in really hungry. Bring your appetite."
+    },
+    {
+      "icon": "tenderloin",
+      "name": "Pork Tenderloin",
+      "text": "The Hoosier classic, done diner style. Lunch the way Indiana likes it."
+    },
+    {
+      "icon": "shake",
+      "name": "Hand-Dipped Shakes",
+      "text": "Thick, cold, and scooped by hand. Worth the brain freeze."
+    },
+    {
+      "icon": "pie",
+      "name": "Cream Pies & Cobblers",
+      "text": "Save room. Ask what's on today."
+    }
+  ],
+
+  "sections": [
+    {
+      "id": "breakfast",
+      "title": "Breakfast Specials",
+      "short": "Breakfast",
+      "items": [
+        { "name": "Jill's BIG Breakfast", "desc": "For when you're really hungry.", "tag": "House favorite" },
+        { "name": "7th Street Special", "desc": "A downtown original, named for the old Seventh Street counter." },
+        { "name": "Washington St. Special", "desc": "Another downtown original." },
+        { "name": "Downtown Sampler", "desc": "A little of this, a little of that." },
+        { "name": "Biscuits & Gravy", "desc": "Warm biscuits smothered in gravy.", "tag": "Regulars' pick" }
+      ]
+    },
+    {
+      "id": "omelettes",
+      "title": "Omelettes",
+      "short": "Omelettes",
+      "layout": "compact",
+      "items": [
+        { "name": "Ham & Cheese" },
+        { "name": "Bacon & Cheese" },
+        { "name": "Sausage & Swiss" },
+        { "name": "Three Cheese" },
+        { "name": "Three Meat & Cheese" },
+        { "name": "Western" },
+        { "name": "Denver" },
+        { "name": "Mexican" }
+      ]
+    },
+    {
+      "id": "pancakes",
+      "title": "Pancakes",
+      "short": "Pancakes",
+      "layout": "compact",
+      "items": [
+        { "name": "Pancakes" },
+        { "name": "Blueberry" },
+        { "name": "Blackberry" },
+        { "name": "Chocolate" },
+        { "name": "Butterscotch" }
+      ]
+    },
+    {
+      "id": "morning-sides",
+      "title": "On the Side",
+      "short": "A.M. Sides",
+      "items": [
+        { "name": "Fried Mush", "desc": "Cornmeal mush, sliced and fried golden.", "tag": "Hard to find" },
+        { "name": "Home Fries" },
+        { "name": "Hash Browns" },
+        { "name": "Bacon, Sausage or Ham" },
+        { "name": "Eggs Your Way" },
+        { "name": "Toast or Cinnamon Sugar Toast" },
+        { "name": "Oatmeal" }
+      ]
+    },
+    {
+      "id": "sandwiches",
+      "title": "Sandwiches & Burgers",
+      "short": "Sandwiches",
+      "items": [
+        { "name": "Pork Tenderloin", "desc": "The Indiana classic.", "tag": "Hoosier classic" },
+        { "name": "Hamburger or Cheeseburger" },
+        { "name": "Tuna Melt" },
+        { "name": "Country Fried Steak Sandwich" },
+        { "name": "Breaded Chicken Sandwich" },
+        { "name": "Grilled Chicken Breast Sandwich" },
+        { "name": "Fish Sandwich" }
+      ]
+    },
+    {
+      "id": "plates",
+      "title": "Homestyle Plates",
+      "short": "Plates",
+      "items": [
+        { "name": "Country Fried Steak" },
+        { "name": "Grilled Chicken Breast" },
+        { "name": "Breaded Chicken Strips" },
+        { "name": "Pork Tenderloin" },
+        { "name": "Catfish" },
+        { "name": "Shrimp" }
+      ]
+    },
+    {
+      "id": "soups",
+      "title": "Soups & Salads",
+      "short": "Soups & Salads",
+      "items": [
+        { "name": "Homemade Chili" },
+        { "name": "Vegetable Soup" },
+        { "name": "Chef Salad" }
+      ]
+    },
+    {
+      "id": "sides",
+      "title": "Lunch Sides",
+      "short": "Sides",
+      "layout": "compact",
+      "items": [
+        { "name": "Mashed Potatoes" },
+        { "name": "Green Beans" },
+        { "name": "French Fries" },
+        { "name": "Onion Rings" }
+      ]
+    },
+    {
+      "id": "sweets",
+      "title": "Pie, Cobbler & Shakes",
+      "short": "Sweets",
+      "items": [
+        { "name": "Hand-Dipped Milkshakes", "tag": "Hand-dipped" },
+        { "name": "Cream Pies" },
+        { "name": "Baked Cobblers" },
+        { "name": "Sundaes" },
+        { "name": "Ice Cream" }
+      ]
+    },
+    {
+      "id": "drinks",
+      "title": "Drinks",
+      "short": "Drinks",
+      "layout": "compact",
+      "items": [
+        { "name": "Coffee" },
+        { "name": "Iced Tea" },
+        { "name": "Coca-Cola Soft Drinks" },
+        { "name": "Juice" }
+      ]
+    }
+  ]
+}
