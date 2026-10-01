@@ -118,6 +118,7 @@
     return client
       .from('orders')
       .select('*')
+      .is('archived_at', null)
       .or('status.in.(pending,accepted),created_at.gte."' + since + '"')
       .order('pickup_time', { ascending: true })
       .limit(200)
@@ -241,6 +242,7 @@
       if (o.status === 'cancelled' && o.cancel_confirmed_by) {
         c.appendChild(el('p', 'ticket-who', 'Customer told by ' + o.cancel_confirmed_by + ', ' + timeFmt.format(new Date(o.cancel_confirmed_at))));
       }
+      actions.appendChild(button('Archive', 'tk-archive', function (b) { archive([o.id], b); }));
     }
     if (actions.children.length) c.appendChild(actions);
     return c;
@@ -324,11 +326,50 @@
   }
   document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') closeCancel(); });
 
+  // Archiving: done tickets (picked up or cancelled) can be cleared off the
+  // board. archive_orders() in the database marks them archived; nothing is
+  // deleted.
+  var lastDone = [];
+  var archiveAllBtn = $('[data-archive-all]');
+  function archive(ids, btn) {
+    btn.disabled = true;
+    return client
+      .rpc('archive_orders', { p_order_ids: ids })
+      .then(function (res) {
+        if (res.error) throw res.error;
+        (res.data || []).forEach(function (row) { orders[row.id] = row; });
+        draw();
+      })
+      .catch(function (err) {
+        console.error('[dashboard] archive failed', err);
+        alert('That didn’t save. Check the internet connection and try again.');
+      })
+      .then(function () { btn.disabled = false; });
+  }
+  function resetArchiveAll() {
+    clearTimeout(resetArchiveAll.t);
+    archiveAllBtn.classList.remove('armed');
+    archiveAllBtn.textContent = 'Archive all';
+  }
+  // Two taps for the whole column, so one stray tap can't clear it.
+  if (archiveAllBtn) archiveAllBtn.addEventListener('click', function () {
+    if (!lastDone.length) return;
+    if (!archiveAllBtn.classList.contains('armed')) {
+      archiveAllBtn.classList.add('armed');
+      archiveAllBtn.textContent = 'Tap again to archive ' + lastDone.length;
+      resetArchiveAll.t = setTimeout(resetArchiveAll, 4000);
+      return;
+    }
+    resetArchiveAll();
+    archive(lastDone.slice(), archiveAllBtn);
+  });
+
   function draw() {
     var groups = { pending: [], accepted: [], done: [] };
     var dayStart = startOfToday().getTime();
     Object.keys(orders).forEach(function (id) {
       var o = orders[id];
+      if (o.archived_at) return;
       if (o.status === 'pending' || o.status === 'accepted') groups[o.status].push(o);
       else if (new Date(o.status_changed_at || o.created_at).getTime() >= dayStart) groups.done.push(o);
     });
@@ -346,6 +387,8 @@
       var count = $('[data-count="' + key + '"]');
       if (count) count.textContent = groups[key].length;
     });
+    lastDone = groups.done.map(function (o) { return o.id; });
+    if (archiveAllBtn) archiveAllBtn.hidden = lastDone.length === 0;
     document.title = (groups.pending.length ? '(' + groups.pending.length + ') ' : '') + 'Orders | Jill’s Diner';
     document.body.classList.toggle('has-pending', groups.pending.length > 0);
   }
