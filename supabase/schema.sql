@@ -9,6 +9,8 @@
 --     status, nothing else. Being logged in is not enough: the account must
 --     also be listed in public.staff.
 --   * Anonymous visitors can't read or write anything.
+--   * Cancelling goes through cancel_order(), which records who told the
+--     customer and when. Staff can't cancel by changing the status directly.
 
 create extension if not exists pgcrypto;
 
@@ -91,11 +93,55 @@ create policy "staff read orders" on public.orders
   for select to authenticated
   using (public.is_staff());
 
+-- Staff can move an order along but not cancel it here: cancelling has to go
+-- through cancel_order() below so the record is always written.
 drop policy if exists "staff update order status" on public.orders;
 create policy "staff update order status" on public.orders
   for update to authenticated
   using (public.is_staff())
-  with check (public.is_staff());
+  with check (public.is_staff() and status <> 'cancelled');
+
+-- ---------- Cancelling ----------
+
+-- Before an order is cancelled, staff call the customer (or tell them in
+-- person) and type their own name on the tablet. cancel_order() is the only
+-- way to cancel. It saves the tablet account, the person's name and the time.
+alter table public.orders add column if not exists cancelled_by uuid references auth.users (id) on delete set null;
+alter table public.orders add column if not exists cancel_confirmed_by text check (char_length(cancel_confirmed_by) between 2 and 60);
+alter table public.orders add column if not exists cancel_confirmed_at timestamptz;
+
+create or replace function public.cancel_order(p_order_id uuid, p_staff_name text)
+returns public.orders
+language plpgsql
+security definer
+set search_path = ''
+as $$
+declare
+  r public.orders;
+  n text := btrim(coalesce(p_staff_name, ''));
+begin
+  if not public.is_staff() then
+    raise exception 'not on the staff list' using errcode = '42501';
+  end if;
+  if char_length(n) < 2 or char_length(n) > 60 then
+    raise exception 'staff name is required' using errcode = '22023';
+  end if;
+  update public.orders
+     set status = 'cancelled',
+         cancelled_by = auth.uid(),
+         cancel_confirmed_by = n,
+         cancel_confirmed_at = now()
+   where id = p_order_id and status in ('pending', 'accepted')
+  returning * into r;
+  if not found then
+    raise exception 'order is not open' using errcode = 'P0002';
+  end if;
+  return r;
+end;
+$$;
+
+revoke all on function public.cancel_order(uuid, text) from public, anon;
+grant execute on function public.cancel_order(uuid, text) to authenticated;
 
 -- ---------- Realtime ----------
 
