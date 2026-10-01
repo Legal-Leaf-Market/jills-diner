@@ -171,3 +171,6 @@ body.dash {
 .dash-modal-call small { font-size: 22px; }
 .dash-modal-check { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 2px dashed var(--line); border-radius: 12px; font-size: 20px; font-weight: 700; cursor: pointer; }
 .dash-modal-check input { width: 32px; height: 32px; flex: none; accent-color: var(--red); }
+.dash-modal-name { display: grid; gap: 6px; font-size: 18px; font-weight: 700; }
+.dash-modal-name input { width: 100%; min-height: 56px; padding: 8px 14px; border: 3px solid var(--ink); border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 20px; font-weight: 600; }
+.ticket-who { margin-top: 4px; font-size: 14px; color: var(--ink-3); }
