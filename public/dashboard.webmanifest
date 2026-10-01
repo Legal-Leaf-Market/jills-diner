@@ -1,0 +1,18 @@
+{
+  "name": "Jill’s Diner Orders",
+  "short_name": "Jill’s Orders",
+  "description": "Live pickup orders for the staff tablet at Jill’s Diner.",
+  "id": "/dashboard/",
+  "start_url": "/dashboard/",
+  "scope": "/dashboard/",
+  "display": "fullscreen",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#2a2420",
+  "theme_color": "#211C18",
+  "icons": [
+    { "src": "/dashboard-icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/dashboard-icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/dashboard-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
