@@ -174,3 +174,9 @@ body.dash {
 .dash-modal-name { display: grid; gap: 6px; font-size: 18px; font-weight: 700; }
 .dash-modal-name input { width: 100%; min-height: 56px; padding: 8px 14px; border: 3px solid var(--ink); border-radius: 12px; background: #fff; color: var(--ink); font: inherit; font-size: 20px; font-weight: 600; }
 .ticket-who { margin-top: 4px; font-size: 14px; color: var(--ink-3); }
+
+/* Archiving done tickets off the board. */
+.dash-archive-all { margin-left: auto; min-height: 40px; padding: 4px 16px; border: 2px solid rgba(251, 245, 234, 0.5); border-radius: 999px; background: transparent; color: var(--paper); font-family: var(--font-display); font-weight: 600; font-size: 15px; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; }
+.dash-archive-all.armed { border-color: var(--paper); background: var(--paper); color: var(--ink); }
+.dash-archive-all:disabled { opacity: 0.5; }
+.tk-archive { grid-column: 1 / -1; min-height: 48px; margin-top: 10px; font-size: 18px; }
