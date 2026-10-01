@@ -143,6 +143,37 @@ $$;
 revoke all on function public.cancel_order(uuid, text) from public, anon;
 grant execute on function public.cancel_order(uuid, text) to authenticated;
 
+-- ---------- Archiving ----------
+
+-- Done orders (picked up or cancelled) can be archived to clear them off the
+-- tablet. Archived orders stay in the database; nothing is deleted.
+alter table public.orders add column if not exists archived_at timestamptz;
+alter table public.orders add column if not exists archived_by uuid references auth.users (id) on delete set null;
+
+create or replace function public.archive_orders(p_order_ids uuid[])
+returns setof public.orders
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if not public.is_staff() then
+    raise exception 'not on the staff list' using errcode = '42501';
+  end if;
+  return query
+    update public.orders
+       set archived_at = now(),
+           archived_by = auth.uid()
+     where id = any(p_order_ids)
+       and status in ('completed', 'cancelled')
+       and archived_at is null
+    returning *;
+end;
+$$;
+
+revoke all on function public.archive_orders(uuid[]) from public, anon;
+grant execute on function public.archive_orders(uuid[]) to authenticated;
+
 -- ---------- Realtime ----------
 
 -- The tablet subscribes to changes on orders. Realtime applies the same
