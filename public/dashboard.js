@@ -225,11 +225,11 @@
     if (o.status === 'pending') {
       actions.appendChild(button('Accept', 'tk-accept', function (b) { setStatus(o.id, 'accepted', b); }));
       actions.appendChild(call);
-      actions.appendChild(confirmButton('Cancel', o.id));
+      actions.appendChild(button('Cancel', 'tk-cancel', function () { openCancel(o); }));
     } else if (o.status === 'accepted') {
       actions.appendChild(button('Picked up', 'tk-done', function (b) { setStatus(o.id, 'completed', b); }));
       actions.appendChild(call);
-      actions.appendChild(confirmButton('Cancel', o.id));
+      actions.appendChild(button('Cancel', 'tk-cancel', function () { openCancel(o); }));
     } else {
       c.appendChild(el('p', 'ticket-final', o.status === 'completed' ? 'Picked up' : 'Cancelled'));
     }
@@ -243,16 +243,50 @@
     b.addEventListener('click', function () { onTap(b); });
     return b;
   }
-  // Two taps to cancel, so a brushed screen can't lose an order.
-  function confirmButton(label, id) {
-    var b = button(label, 'tk-cancel', function () {
-      if (b.classList.contains('armed')) { setStatus(id, 'cancelled', b); return; }
-      b.classList.add('armed');
-      b.textContent = 'Tap again to cancel';
-      setTimeout(function () { b.classList.remove('armed'); b.textContent = label; }, 4000);
-    });
-    return b;
+  // Cancelling: staff have to tell the customer first. The box shows the
+  // customer's number to call, and the cancel button stays locked until
+  // someone confirms the customer knows (by phone or in person).
+  var cancelBox = null;
+  function closeCancel() {
+    if (cancelBox) { cancelBox.remove(); cancelBox = null; }
   }
+  function openCancel(o) {
+    closeCancel();
+    var wrap = el('div', 'dash-modal');
+    var box = el('div', 'dash-modal-box');
+    box.setAttribute('role', 'dialog');
+    box.setAttribute('aria-modal', 'true');
+    box.setAttribute('aria-label', 'Cancel order #' + o.order_number);
+    box.appendChild(el('h2', 'dash-modal-title', 'Cancel order #' + o.order_number + '?'));
+    box.appendChild(el('p', null, 'Call ' + o.customer_name + ' first and tell them why you’re cancelling.'));
+    var call = el('a', 'tk-btn tk-call dash-modal-call', 'Call ' + o.customer_name);
+    call.appendChild(el('small', null, prettyPhone(o.customer_phone)));
+    call.href = 'tel:' + o.customer_phone;
+    box.appendChild(call);
+    var check = document.createElement('input');
+    check.type = 'checkbox';
+    var label = el('label', 'dash-modal-check');
+    label.appendChild(check);
+    label.appendChild(el('span', null, 'I told the customer, by phone or in person'));
+    box.appendChild(label);
+    var row = el('div', 'ticket-actions');
+    row.appendChild(button('Keep order', 'tk-keep', closeCancel));
+    var go = button('Cancel order', 'tk-cancel armed', function (b) {
+      if (!check.checked) return;
+      setStatus(o.id, 'cancelled', b).then(function () {
+        if (orders[o.id] && orders[o.id].status === 'cancelled') closeCancel();
+      });
+    });
+    go.disabled = true;
+    check.addEventListener('change', function () { go.disabled = !check.checked; });
+    row.appendChild(go);
+    box.appendChild(row);
+    wrap.appendChild(box);
+    wrap.addEventListener('click', function (ev) { if (ev.target === wrap) closeCancel(); });
+    document.body.appendChild(wrap);
+    cancelBox = wrap;
+  }
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') closeCancel(); });
 
   function draw() {
     var groups = { pending: [], accepted: [], done: [] };
