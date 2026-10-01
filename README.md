@@ -52,9 +52,9 @@ npm run dev     # build, then preview at http://localhost:4321
 
 ## Hosting
 
-The repo is linked to Vercel: every push to `main` redeploys the site in about
-half a minute. `netlify.toml` is also included, so the same repo can go on
-Netlify with no changes.
+Netlify, connected to this repo: every push to `main` redeploys in under a
+minute. `netlify.toml` holds the build settings. If the Netlify site name
+isn't `jills-diner`, update `"url"` in `content/site.json` to match.
 
 ## Before it goes live
 
@@ -69,7 +69,7 @@ Netlify with no changes.
    permission) will do more than any drawing.
 4. **Flip the switch.** In `content/site.json` set `"preview": false`. That
    removes `noindex` and the preview note, and adds `robots.txt` and a sitemap.
-5. **Domain.** Buy one, point it at Vercel, and update `"url"` in
+5. **Domain.** Buy one, point it at Netlify, and update `"url"` in
    `content/site.json`.
 6. **Google Business Profile and Facebook.** Make sure both show the National
    Road address and hours, and link to the new site. The Google profile is what
