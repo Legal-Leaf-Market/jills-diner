@@ -10,6 +10,12 @@
   var $ = function (sel, root) { return (root || document).querySelector(sel); };
   var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
 
+  // Installable app: public/dashboard-sw.js (scoped to /dashboard/) lets the
+  // board be added to the home screen and still open if the wifi blips.
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/dashboard-sw.js', { scope: '/dashboard/' }).catch(function () {});
+  }
+
   var config = null;
   try { config = JSON.parse($('#dash-config').textContent); } catch (e) { /* fall through */ }
 
@@ -385,7 +391,21 @@
       .then(function () { btn.disabled = false; });
   });
 
+  // Fill the screen when the board is started in a browser tab. Opened from
+  // the home-screen icon it already has no browser bars, so this does nothing.
+  function goFullscreen() {
+    var standalone = navigator.standalone || window.matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches;
+    var root = document.documentElement;
+    var request = root.requestFullscreen || root.webkitRequestFullscreen;
+    if (standalone || !request || document.fullscreenElement || document.webkitFullscreenElement) return;
+    try {
+      var p = request.call(root);
+      if (p && p.catch) p.catch(function () {});
+    } catch (e) { /* not allowed here; the board works the same without it */ }
+  }
+
   $('[data-start]').addEventListener('click', function () {
+    goFullscreen();
     unlockAudio();
     chime();
     keepAwake();
