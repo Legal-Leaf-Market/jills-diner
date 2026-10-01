@@ -1,9 +1,16 @@
-# Same site on Netlify, if it ever moves there: connect the repo and this file
-# does the rest.
+# Netlify build, functions and headers. Pushes to main deploy automatically.
 
 [build]
   command = "node build.mjs"
   publish = "dist"
+
+# The order endpoint (/api/order). Secrets it needs, set in Netlify's
+# environment variables, never in this repo: SUPABASE_URL,
+# SUPABASE_SERVICE_ROLE_KEY. The build also reads SUPABASE_URL and
+# SUPABASE_ANON_KEY (public by design) for the cart and the tablet.
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
 
 [[headers]]
   for = "/fonts/*"
@@ -17,3 +24,11 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
     X-Frame-Options = "SAMEORIGIN"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+
+# The staff tablet: never indexed, never cached, never framed.
+[[headers]]
+  for = "/dashboard/*"
+  [headers.values]
+    X-Robots-Tag = "noindex, nofollow"
+    Cache-Control = "no-store"
+    Content-Security-Policy = "frame-ancestors 'none'"

@@ -3,3 +3,4 @@ node_modules/
 .vercel/
 .netlify/
 .DS_Store
+netlify/functions/order/catalog.generated.mjs

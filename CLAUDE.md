@@ -18,13 +18,22 @@ free preview to pitch to the owner, Jill. See README.md for the full picture.
   reviews are shown on the page.
 - **Keep Jill's health and the eviction off the site** unless she asks for them.
 - **Stay dependency-free.** The build is plain Node; don't add a framework or
-  npm packages without a real reason.
+  npm packages without a real reason. The one third-party library is
+  supabase-js, vendored in `public/vendor/` for the staff tablet.
+- **Online ordering fails closed.** The cart renders only when
+  `"ordering": true` in `site.json` AND `SUPABASE_URL` is set at build. The
+  order function refuses when either is missing. Never trust prices, item
+  names or pickup times from the browser: `src/order-core.mjs` is the single
+  source for what's orderable, what it costs and when it can be picked up, and
+  both the function and the cart use it. Keep `supabase/schema.sql`
+  idempotent and keep row level security as tight as it is (staff may only
+  read orders and change `status`).
 - `"preview": true` in `site.json` keeps the pages `noindex` and shows the
   preview note. Only flip it once Jill has approved the site.
 
 ## Checking work
 
-- `npm run build` must pass.
+- `npm test` must pass (it builds first).
 - Layout changes get checked in headless Chromium at 360, 390, 768, 1280 and
   1440 px wide with no horizontal scroll, and `/menu/` must still print on
   two Letter pages (front and back).

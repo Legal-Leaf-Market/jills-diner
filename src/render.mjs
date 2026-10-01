@@ -2,6 +2,7 @@
 // pages and should stay easy for anyone to read and change.
 
 import { art, icon } from './icons.mjs';
+import { itemId } from './order-core.mjs';
 
 const DOW = { Sunday: 0, Monday: 1, Tuesday: 2, Wednesday: 3, Thursday: 4, Friday: 5, Saturday: 6 };
 
@@ -196,16 +197,32 @@ function priceTag(i) {
   return i.price ? `<span class="leader" aria-hidden="true"></span><span class="price">${money(i.price)}</span>` : '';
 }
 
-function item(i) {
+// "Add" buttons ship hidden; public/order.js reveals them once the cart is
+// ready, so a page without working JavaScript never shows a dead button.
+function addButtons(s, i, compact) {
+  if (i.orderable === false) return '';
+  if (i.prices?.length) {
+    return `<div class="item-add">${i.prices
+      .map((v) => `<button type="button" class="add-btn" data-add="${esc(itemId(s, i, v))}" aria-label="Add ${t(i.name)}, ${t(v.label)}" hidden>+ ${t(v.label)}</button>`)
+      .join('')}</div>`;
+  }
+  if (!(i.price ?? s.price)) return '';
+  if (compact) return `<button type="button" class="add-btn add-btn-sm" data-add="${esc(itemId(s, i))}" aria-label="Add ${t(i.name)}" hidden>+</button>`;
+  return `<div class="item-add"><button type="button" class="add-btn" data-add="${esc(itemId(s, i))}" aria-label="Add ${t(i.name)}" hidden>+ Add</button></div>`;
+}
+
+function item(i, s, ordering) {
   const price = priceTag(i);
+  const compact = s.layout === 'compact';
+  const add = ordering ? addButtons(s, i, compact) : '';
   return `
           <li class="item">
-            <div class="item-top"><span class="item-name">${t(i.name)}</span>${i.tag ? ` <span class="tag">${t(i.tag)}</span>` : ''}${price}</div>
-            ${i.desc ? `<p class="item-desc">${t(i.desc)}</p>` : ''}
+            <div class="item-top"><span class="item-name">${t(i.name)}</span>${i.tag ? ` <span class="tag">${t(i.tag)}</span>` : ''}${price}${compact ? add : ''}</div>
+            ${i.desc ? `<p class="item-desc">${t(i.desc)}</p>` : ''}${compact ? '' : add}
           </li>`;
 }
 
-const menuCard = (menu, { standalone }) => `
+const menuCard = (menu, { standalone, ordering }) => `
 <div class="menu-card">
   <nav class="menu-nav" aria-label="Jump to a part of the menu">
     <ul role="list">
@@ -219,7 +236,7 @@ const menuCard = (menu, { standalone }) => `
     <section class="menu-group" id="m-${esc(s.id)}" aria-labelledby="m-${esc(s.id)}-h">
       <h3 id="m-${esc(s.id)}-h"><span>${t(s.title)}</span>${s.price ? `<span class="group-price">${money(s.price)}</span>` : ''}</h3>
       ${(s.notes ?? []).map((n) => `<p class="group-note">${t(n)}</p>`).join('')}
-      <ul class="items${s.layout === 'compact' ? ' items-compact' : ''}" role="list">${s.items.map(item).join('')}
+      <ul class="items${s.layout === 'compact' ? ' items-compact' : ''}" role="list">${s.items.map((i) => item(i, s, ordering)).join('')}
       </ul>
       ${(s.extras ?? []).map((n) => `<p class="group-extra">${t(n)}</p>`).join('')}
     </section>`,
@@ -236,14 +253,14 @@ const menuCard = (menu, { standalone }) => `
   </div>
 </div>`;
 
-const menuSection = (site, menu) => `
+const menuSection = (site, menu, ordering) => `
 <section class="menu-section" id="menu" aria-labelledby="menu-title">
   <div class="wrap">
     <header class="section-head on-red">
       <p class="kicker">Breakfast all day &amp; lunch till close</p>
       <h2 id="menu-title">The Menu</h2>
     </header>
-    ${menuCard(menu, { standalone: false })}
+    ${menuCard(menu, { standalone: false, ordering })}
   </div>
 </section>`;
 
@@ -371,7 +388,7 @@ const footer = (site, base) => {
 </nav>`;
 };
 
-function page({ site, assets, path, title, description, body }) {
+function page({ site, assets, path, title, description, body, head = '' }) {
   const canonical = `${site.url}${path}`;
   const hoursData = JSON.stringify({
     tz: site.timezone,
@@ -406,41 +423,96 @@ ${site.preview ? '<meta name="robots" content="noindex, nofollow">\n' : ''}<link
 <script type="application/ld+json">${jsonLd(site)}</script>
 <script type="application/json" id="hours-data">${hoursData.replace(/</g, '\\u003c')}</script>
 <script src="/app.js?v=${assets.js}" defer></script>
+${head}
 </head>
 ${body}
 </html>
 `;
 }
 
-export function renderHome({ site, menu, assets }) {
+// The cart and checkout. Only rendered when ordering is switched on and
+// Supabase is configured; public/order.js drives it.
+const cartUi = (site) => `
+<button type="button" class="cart-fab" data-cart-open hidden>
+  <span class="cart-fab-count" data-cart-count>0</span>
+  <span class="cart-fab-label">Your order</span>
+  <span class="cart-fab-total" data-cart-total>$0.00</span>
+</button>
+<dialog class="cart" aria-labelledby="cart-title" data-cart>
+  <div class="cart-inner">
+    <header class="cart-head">
+      <h2 id="cart-title" data-cart-title>Your order</h2>
+      <button type="button" class="cart-x" data-cart-close aria-label="Close">\u00d7</button>
+    </header>
+    <div data-cart-view="cart">
+      <p class="cart-empty" data-cart-empty>Nothing here yet. Tap <strong>+ Add</strong> on anything on the menu.</p>
+      <ul class="cart-lines" role="list" data-cart-lines></ul>
+      <div class="cart-sum" data-cart-sum><span>Subtotal</span><strong data-cart-subtotal>$0.00</strong></div>
+      <p class="cart-pay">Pay at the counter when you pick up. Want it changed or added to? Say so in the notes and it gets rung up at the counter.</p>
+      <form class="checkout" data-checkout novalidate>
+        <div class="field-row">
+          <label class="field"><span>First name</span><input name="firstName" autocomplete="given-name" maxlength="40" required></label>
+          <label class="field"><span>Last name</span><input name="lastName" autocomplete="family-name" maxlength="40" required></label>
+        </div>
+        <label class="field"><span>Phone</span><input name="phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="(812) 555-0123" required></label>
+        <label class="field"><span>Pickup time</span><select name="pickupTime" required data-pickup></select></label>
+        <label class="field"><span>Notes <em>(optional)</em></span><textarea name="notes" rows="3" maxlength="500" placeholder="Eggs over medium, wheat toast, no onions\u2026"></textarea></label>
+        <label class="hp" aria-hidden="true">Company<input name="company" tabindex="-1" autocomplete="off"></label>
+        <p class="form-error" role="alert" data-error hidden></p>
+        <button type="submit" class="btn btn-red checkout-submit" data-submit>Place pickup order</button>
+        <p class="cart-fine">We only use your number to call about this order.</p>
+      </form>
+    </div>
+    <div class="cart-done" data-cart-view="done" hidden>
+      <p class="done-big">Order <span data-done-number></span> is in!</p>
+      <p data-done-when></p>
+      <p>Pay at the counter when you get here. If anything\u2019s out or unclear, we\u2019ll call you.</p>
+      <p class="done-call">Need to change it? Call <a href="${links(site).tel}">${esc(site.phone)}</a>.</p>
+      <button type="button" class="btn btn-ink" data-cart-close>Done</button>
+    </div>
+  </div>
+</dialog>`;
+
+function orderHead({ assets, orderData }) {
+  if (!orderData) return '';
+  return `<script type="application/json" id="order-data">${JSON.stringify(orderData).replace(/</g, '\\u003c')}</script>
+<script src="/order.js?v=${assets.order}" defer></script>`;
+}
+
+export function renderHome({ site, menu, assets, orderData }) {
+  const ordering = Boolean(orderData);
   return page({
     site,
     assets,
     path: '/',
+    head: orderHead({ assets, orderData }),
     title: `${typo(site.name)} | Breakfast & Lunch in Columbus, Indiana`,
-    description: `Breakfast and lunch at ${site.address.street}, Columbus, Indiana: biscuits and gravy, fried mush, tenderloins, pie and hot coffee. Open Tuesday to Sunday.`,
+    description: `Breakfast and lunch at ${site.address.street}, Columbus, Indiana: biscuits and gravy, fried mush, tenderloins, burgers and hot coffee. Open Tuesday to Sunday.`,
     body: `<body class="home">
 ${header(site, '')}
 <main id="main">
 ${hero(site)}
 <div class="checker" aria-hidden="true"></div>
 ${favorites(menu)}
-${menuSection(site, menu)}
+${menuSection(site, menu, ordering)}
 ${visit(site)}
 ${story(site)}
 </main>
 ${footer(site, '')}
+${ordering ? cartUi(site) : ''}
 </body>`,
   });
 }
 
-export function renderMenuPage({ site, menu, assets }) {
+export function renderMenuPage({ site, menu, assets, orderData }) {
+  const ordering = Boolean(orderData);
   return page({
     site,
     assets,
     path: '/menu/',
+    head: orderHead({ assets, orderData }),
     title: `Menu | ${typo(site.name)}, Columbus, Indiana`,
-    description: `The ${typo(site.name)} menu: breakfast specials, omelettes, pancakes, sandwiches, homestyle plates, pie and shakes. ${site.address.street}, Columbus, Indiana.`,
+    description: `The ${typo(site.name)} menu with prices: all-day breakfast, biscuits and gravy, omelettes, burgers, tenderloins, homestyle meals and floats. ${site.address.street}, Columbus, Indiana.`,
     body: `<body class="menu-page">
 ${header(site, '/')}
 <main id="main">
@@ -456,11 +528,84 @@ ${header(site, '/')}
       <p>${t(fullAddress(site.address))} \u00b7 ${esc(site.phone)}</p>
       <p>${hoursSummary(site.hours).map((g) => `${esc(g.days)}: ${esc(g.hours)}`).join(' \u00b7 ')}</p>
     </div>
-    ${menuCard(menu, { standalone: true })}
+    ${menuCard(menu, { standalone: true, ordering })}
   </div>
 </section>
 </main>
 ${footer(site, '/')}
+${ordering ? cartUi(site) : ''}
 </body>`,
   });
+}
+
+// The staff tablet. Never linked from the site and never indexed; the data
+// itself is protected by Supabase login plus row level security, not by
+// this page being hard to find.
+export function renderDashboard({ site, assets, dashboardConfig }) {
+  const config = JSON.stringify(dashboardConfig ?? null).replace(/</g, '\\u003c');
+  return `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Orders | ${t(site.name)}</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#211C18">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="stylesheet" href="/styles.css?v=${assets.css}">
+<link rel="stylesheet" href="/dashboard.css?v=${assets.dashCss}">
+<script type="application/json" id="dash-config">${config}</script>
+<script src="/vendor/supabase-2.117.2.js" defer></script>
+<script src="/dashboard.js?v=${assets.dash}" defer></script>
+</head>
+<body class="dash">
+<header class="dash-bar">
+  <p class="dash-brand"><span class="brand-script">Jill\u2019s</span> <span>Orders</span></p>
+  <p class="dash-live" data-live><span class="dot"></span><span data-live-text>Connecting\u2026</span></p>
+  <p class="dash-clock" data-clock></p>
+  <button type="button" class="btn btn-ghost btn-sm" data-signout hidden>Sign out</button>
+</header>
+
+<main>
+  <section class="dash-panel" data-view="unconfigured" hidden>
+    <h1>Not set up yet</h1>
+    <p>Online ordering needs a Supabase project. See <code>README.md</code>, section \u201cOnline ordering\u201d.</p>
+  </section>
+
+  <section class="dash-panel" data-view="login" hidden>
+    <h1>Staff sign in</h1>
+    <form data-login>
+      <label class="field"><span>Email</span><input name="email" type="email" autocomplete="username" required></label>
+      <label class="field"><span>Password</span><input name="password" type="password" autocomplete="current-password" required></label>
+      <p class="form-error" role="alert" data-login-error hidden></p>
+      <button class="btn btn-red" type="submit">Sign in</button>
+    </form>
+  </section>
+
+  <section class="dash-panel" data-view="start" hidden>
+    <h1>Ready for orders</h1>
+    <p>Tap below so the tablet can play the order chime and keep its screen on.</p>
+    <button type="button" class="btn btn-red dash-start" data-start>Start taking orders</button>
+  </section>
+
+  <section class="dash-board" data-view="board" hidden>
+    <div class="dash-col">
+      <h2>New <span class="count" data-count="pending">0</span></h2>
+      <div class="dash-list" data-list="pending"><p class="dash-none">No new orders.</p></div>
+    </div>
+    <div class="dash-col">
+      <h2>Accepted <span class="count" data-count="accepted">0</span></h2>
+      <div class="dash-list" data-list="accepted"><p class="dash-none">Nothing in progress.</p></div>
+    </div>
+    <div class="dash-col dash-col-done">
+      <h2>Done today</h2>
+      <div class="dash-list" data-list="done"><p class="dash-none">Nothing yet today.</p></div>
+    </div>
+  </section>
+</main>
+<div class="dash-alert" data-alert hidden><p>New order!</p></div>
+</body>
+</html>
+`;
 }
