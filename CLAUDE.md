@@ -26,16 +26,15 @@ free preview to pitch to the owner, Jill. See README.md for the full picture.
 
 - `npm run build` must pass.
 - Layout changes get checked in headless Chromium at 360, 390, 768, 1280 and
-  1440 px wide with no horizontal scroll, and `/menu/` must still print on one
-  Letter page.
+  1440 px wide with no horizontal scroll, and `/menu/` must still print on
+  two Letter pages (front and back).
 - The open/closed badge uses Indiana time regardless of the visitor's time
   zone; test edge times (just before open, 30 minutes before close, Monday,
   Sunday night) after touching `public/app.js`.
 
-## Unconfirmed (verify with Jill before launch)
+## Source of truth
 
-- Phone (812) 418-8970 carried over from downtown.
-- Hours: Tue to Fri 6:00 to 14:00, Sat 7:00 to 12:45, Sun 8:00 to 12:45, Mon closed.
-- Whether the 7th Street Special, Washington St. Special and Downtown Sampler
-  kept their names, and what's in them.
-- Current prices (none shown).
+The menu, prices, phone (812) 799-0016 and hours (Tue to Fri 6:00 to 14:00,
+Sat 7:00 to 13:00, Sun 8:00 to 13:00, Mon closed) come from the diner's printed
+menu, summer 2026. Jill has not yet approved the site itself, so `preview`
+stays true until she does.

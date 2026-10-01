@@ -30,10 +30,12 @@ Everything a person might want to change lives in two files:
 | `content/menu.json` | The menu sections and items, and the six "house favorites" cards |
 
 Menu items take an optional `desc` (one short line), `tag` (a small badge like
-"Regulars' pick") and `price` (just the number, like `"6.49"`). A price only
-shows up if it's filled in.
+"Local favorite"), and either `price` (just the number, like `"6.75"`) or
+`prices` for labeled ones (cup and bowl, small and large). A section can have
+one `price` for everything in it, `notes` under its heading, and `extras` for
+add-ons.
 
-Hours use the 24-hour clock (`"06:00"`, `"14:00"`, `"12:45"`). The open/closed
+Hours use the 24-hour clock (`"06:00"`, `"14:00"`, `"13:00"`). The open/closed
 badge always uses Indiana time, wherever the visitor is.
 
 The build checks your edits and stops with a plain-English message if something
@@ -56,16 +58,10 @@ Netlify with no changes.
 
 ## Before it goes live
 
-1. **Confirm the facts with Jill.** Everything on the site came from public
-   listings and newspaper coverage, not from the diner itself:
-   - Phone (812) 418-8970, the long-time downtown number, which listings show
-     carried over to National Road.
-   - Hours: Tuesday to Friday 6 AM to 2 PM, Saturday 7 AM to 12:45 PM, Sunday
-     8 AM to 12:45 PM, closed Monday.
-   - Menu names and what's actually on the menu today. The 7th Street Special,
-     Washington St. Special and Downtown Sampler come from the downtown menu
-     and may have been renamed. Descriptions for those three are placeholders.
-   - Prices are deliberately left off. The only prices online are from 2020.
+1. **Show Jill.** The menu, prices, phone number and hours now come straight
+   from the diner's own printed menu (summer 2026). The phone on that menu is
+   (812) 799-0016, and Saturday and Sunday close at 1 PM. If anything has
+   changed since it was printed, edit `content/menu.json` or `content/site.json`.
 2. **Ask Jill about the story section.** The timeline (Gerald I. Davis in 1952,
    the Stotts, Sadie Cress, the Kramers, Jill in 2008) comes from reporting in
    *The Republic*. She may want to add to it or tell it differently.
@@ -86,15 +82,14 @@ Netlify with no changes.
 - Star ratings and quoted reviews. Rating markup without real reviews shown on
   the page breaks Google's rules, and the reviews online are mostly from the
   downtown days anyway.
-- Old prices, for the reason above.
 
 ## Sources used for the preview
 
 - *The Republic*: "Decades of a diner" (Feb 2017), "A tribute to a true American
   diner, right here in Columbus" (Oct 2024), "Moving on: Jill's Downtown Diner
   evicted" (Feb 2025), "Jill's Downtown Diner finds new home" (Jul 2025).
-- Yelp, Tripadvisor, Checkle and The Menyu App listings for menu items, hours
-  and the phone number.
+- The diner's own printed menu (summer 2026) for every item, price, the phone
+  number and the hours.
 - Rural King (2985 N. National Rd) and Disc Replay (3015 N. National Rd)
   listings to pin down the landmark and ZIP code.
 

@@ -1,120 +1,207 @@
 {
-  "_readme": "The whole menu. Add, remove or rename items here and redeploy. Every item takes an optional \"desc\" (one short line), \"tag\" (a small badge like \"Regulars' pick\") and \"price\" (just the number, like \"6.49\"). Prices are left off until Jill confirms the current ones; the page shows a price only when one is filled in.",
+  "_readme": "The whole menu, transcribed from the diner's printed menu (summer 2026). Items take an optional \"desc\" (one short line), \"tag\" (a small badge), and either \"price\" (just the number, like \"6.75\") or \"prices\" (a list of {\"label\", \"price\"} for things like cup and bowl). A section can carry its own \"price\" (when everything in it costs the same), \"notes\" (lines under the heading) and \"extras\" (add-ons shown under the list).",
 
   "favorites": [
     {
       "icon": "biscuits",
       "name": "Biscuits & Gravy",
-      "text": "Warm biscuits under a blanket of gravy. A regulars' favorite for years."
+      "text": "Best in town, says the menu. Half or full order, or make it a plate with eggs, meat and potatoes."
     },
     {
       "icon": "mush",
       "name": "Fried Mush",
-      "text": "Cornmeal mush, sliced and fried golden. Hard to find anywhere else these days."
+      "text": "Five slices of golden fried mush. Add bacon, sausage or ham. Hard to find anywhere else."
     },
     {
       "icon": "big",
-      "name": "Jill's BIG Breakfast",
-      "text": "For the mornings you walk in really hungry. Bring your appetite."
+      "name": "Jill's Big Breakfast",
+      "text": "Country fried steak or grilled tenderloin, three eggs, hash rounds or home fries, and a pancake or biscuits and gravy."
     },
     {
       "icon": "tenderloin",
       "name": "Pork Tenderloin",
-      "text": "The Hoosier classic, done diner style. Lunch the way Indiana likes it."
+      "text": "Grilled or hand breaded, served deluxe on a toasted bun. The Hoosier classic."
+    },
+    {
+      "icon": "burger",
+      "name": "Big J Burger",
+      "text": "A half pound of ground beef with cheese, served with chips. Make it a basket for fries and slaw."
     },
     {
       "icon": "shake",
-      "name": "Hand-Dipped Shakes",
-      "text": "Thick, cold, and scooped by hand. Worth the brain freeze."
-    },
-    {
-      "icon": "pie",
-      "name": "Cream Pies & Cobblers",
-      "text": "Save room. Ask what's on today."
+      "name": "Floats",
+      "text": "Red cream, vanilla cream, Dreamsicle or root beer. Worth saving room for."
     }
   ],
 
   "sections": [
     {
       "id": "breakfast",
-      "title": "Breakfast Specials",
+      "title": "All Day Breakfast",
       "short": "Breakfast",
       "items": [
-        { "name": "Jill's BIG Breakfast", "desc": "For when you're really hungry.", "tag": "House favorite" },
-        { "name": "7th Street Special", "desc": "A downtown original, named for the old Seventh Street counter." },
-        { "name": "Washington St. Special", "desc": "Another downtown original." },
-        { "name": "Downtown Sampler", "desc": "A little of this, a little of that." },
-        { "name": "Biscuits & Gravy", "desc": "Warm biscuits smothered in gravy.", "tag": "Regulars' pick" }
+        { "name": "Jill's Big Breakfast", "price": "9.99", "tag": "Local favorite", "desc": "Choice of country fried steak or grilled pork tenderloin, with 3 eggs, a full order of hash rounds or home fries, and 1 pancake or half biscuits and gravy." },
+        { "name": "7th Street Special", "price": "6.55", "desc": "Two eggs and your choice of bacon, sausage patties or links, with white or wheat toast." },
+        { "name": "Washington St. Special", "price": "6.75", "desc": "Two eggs, 3 silver dollar pancakes, and your choice of bacon, sausage patties or links." },
+        { "name": "Sampler", "price": "6.25", "desc": "One egg, 1 bacon, 1 sausage patty or link, half order of hash rounds or home fries, and 1 slice of toast with a side dish of gravy." },
+        { "name": "Corned Beef Hash, 2 Eggs & Toast", "price": "8.99" },
+        { "name": "Rise-N-Shine", "price": "4.50", "desc": "Two eggs served with toast." },
+        { "name": "Just Enough", "price": "4.89", "desc": "One egg, 2 bacon or 1 sausage (patty or link), with white or wheat toast." },
+        { "name": "French Toast", "tag": "Local favorite", "prices": [{ "label": "Half", "price": "3.50" }, { "label": "Full", "price": "4.99" }], "desc": "Two slices of Texas toast dipped in cinnamon batter, topped with powdered sugar." },
+        { "name": "Fried Mush", "tag": "Local favorite", "price": "3.99", "desc": "Five slices of golden fried mush. With bacon or sausage 4.99, with ham 5.15." }
+      ]
+    },
+    {
+      "id": "biscuits",
+      "title": "Biscuits & Gravy",
+      "short": "Biscuits & Gravy",
+      "items": [
+        { "name": "Half Order Biscuits & Gravy", "price": "4.75", "desc": "Best in town." },
+        { "name": "Full Order Biscuits & Gravy", "price": "6.50" },
+        { "name": "Half Order with Potatoes", "price": "5.99", "desc": "With a half order of hash rounds or home fries." },
+        { "name": "Half Order with 2 Eggs", "price": "5.99" },
+        { "name": "Half Order, Eggs, Meat & Potatoes", "price": "8.25", "tag": "Local favorite", "desc": "Half order of biscuits and gravy, 2 eggs, your choice of bacon, sausage patties or links, and a half order of hash rounds or home fries." }
       ]
     },
     {
       "id": "omelettes",
       "title": "Omelettes",
       "short": "Omelettes",
-      "layout": "compact",
+      "notes": ["Made with two eggs, served with white or wheat toast."],
       "items": [
-        { "name": "Ham & Cheese" },
-        { "name": "Bacon & Cheese" },
-        { "name": "Sausage & Swiss" },
-        { "name": "Three Cheese" },
-        { "name": "Three Meat & Cheese" },
-        { "name": "Western" },
-        { "name": "Denver" },
-        { "name": "Mexican" }
+        { "name": "Three Cheese", "price": "5.99", "desc": "American, Swiss and shredded cheddar." },
+        { "name": "Ham & Cheese", "price": "6.75", "desc": "Diced ham with shredded cheddar." },
+        { "name": "Bacon & Cheese", "price": "6.75", "desc": "Bacon with shredded cheddar." },
+        { "name": "Sausage & Swiss", "price": "6.75", "tag": "Local favorite", "desc": "Crumbled sausage with Swiss cheese." },
+        { "name": "Western", "price": "7.99", "desc": "Ham, bell pepper and onion, with shredded cheddar." },
+        { "name": "Denver", "price": "7.99", "desc": "Bacon, bell pepper and onion, with shredded cheddar." },
+        { "name": "Three Meat", "price": "7.99", "tag": "Local favorite", "desc": "Bacon, sausage and ham with shredded cheddar." },
+        { "name": "Mexican", "price": "7.99", "desc": "Crumbled sausage, bell pepper and onion, jalapeños and Swiss, with salsa and sour cream." }
+      ],
+      "extras": [
+        "Add-ins 0.75 each: spinach, onions, bell pepper and onion, mushrooms, tomatoes, jalapeños, salsa.",
+        "Add bacon, sausage or ham for 1.50 each. Swap white or wheat toast for another bread for 0.50."
       ]
     },
     {
       "id": "pancakes",
       "title": "Pancakes",
       "short": "Pancakes",
+      "items": [
+        { "name": "One Large Fluffy Pancake", "price": "2.50" }
+      ],
+      "extras": [
+        "Add-ins 0.99 each, per pancake. Chips: chocolate or butterscotch. Fruit: blueberry or blackberry."
+      ]
+    },
+    {
+      "id": "breakfast-sandwich",
+      "title": "Breakfast Sandwich",
+      "short": "Egg Sandwich",
+      "price": "4.75",
+      "notes": ["One egg, one meat and a slice of cheese on bread or toast."],
+      "items": [
+        { "name": "Meat: Bob's fried bologna, bacon, sausage or ham" },
+        { "name": "Bread: white, wheat, rye, raisin, biscuit, bagel or English muffin" }
+      ]
+    },
+    {
+      "id": "a-la-carte",
+      "title": "A La Carte",
+      "short": "A La Carte",
+      "items": [
+        { "name": "3 Silver Dollar Pancakes", "price": "3.75" },
+        { "name": "Hash Rounds or Home Fries", "price": "2.75" },
+        { "name": "Oatmeal with Milk", "price": "3.50" },
+        { "name": "Grits", "price": "2.75" },
+        { "name": "3 Bacon Strips", "price": "2.99" },
+        { "name": "2 Sausage Patties or Links", "price": "2.99" },
+        { "name": "Slice of Ham", "price": "3.15" },
+        { "name": "1 Egg", "price": "1.75" },
+        { "name": "Dish of Sausage Gravy", "price": "1.50" },
+        { "name": "Cinnamon Sugar Toast", "price": "1.99" },
+        { "name": "White or Wheat Toast", "price": "1.50" },
+        { "name": "Rye, Raisin, Biscuit, Bagel or English Muffin", "price": "1.75" },
+        { "name": "Peanut Butter", "price": "0.75" },
+        { "name": "Cream Cheese", "price": "0.75" }
+      ]
+    },
+    {
+      "id": "burgers",
+      "title": "Burgers & Sandwiches",
+      "short": "Lunch",
+      "notes": ["All sandwiches are served with chips."],
+      "items": [
+        { "name": "Jill's Big J Burger", "price": "6.50", "desc": "Half pound of ground beef with cheese." },
+        { "name": "Quarter Pound Burger", "price": "4.75", "desc": "Quarter pound of ground beef with cheese." },
+        { "name": "Double Cheeseburger", "price": "5.50", "desc": "Two quarter pounds of ground beef with two slices of cheese." },
+        { "name": "Texas Cheeseburger", "price": "6.75", "desc": "Quarter pound burger with grilled ham, grilled onions and American cheese." },
+        { "name": "Mushroom & Swiss Burger", "price": "5.25", "desc": "Quarter pound burger covered in mushrooms and melted Swiss." },
+        { "name": "Pizza Burger", "price": "5.89", "desc": "Quarter pound burger with pizza sauce and melted Swiss." },
+        { "name": "Patty Melt", "price": "6.50", "tag": "Local favorite", "desc": "Quarter pound burger on grilled rye with grilled onions and Swiss." },
+        { "name": "Pork Tenderloin", "price": "8.75", "tag": "Local favorite", "desc": "Grilled or breaded seasoned pork tenderloin, served deluxe on a toasted bun." },
+        { "name": "Country Fried Steak", "price": "6.15", "desc": "Breaded country fried steak on a grilled bun." },
+        { "name": "Chicken Breast", "price": "6.00", "desc": "Grilled or breaded, on a grilled bun." },
+        { "name": "Alaskan White Fish", "price": "6.00", "desc": "Breaded, on a toasted bun with lettuce and homemade tartar sauce." },
+        { "name": "Tuna Melt", "price": "5.89", "tag": "Local favorite", "desc": "Tuna on grilled Texas toast with melted Swiss." },
+        { "name": "Grilled Cheese", "price": "4.25", "desc": "On grilled Texas toast with melted American cheese. Add grilled ham for 1.70." },
+        { "name": "B-L-T", "price": "5.99", "tag": "Local favorite", "desc": "Crispy fried bacon, lettuce, tomato and mayo on your choice of toast or bread." },
+        { "name": "Tuna, Chicken or Egg Salad", "price": "5.50", "desc": "Homemade, with lettuce and tomato on bread or toast." }
+      ],
+      "extras": [
+        "Make it deluxe (lettuce, tomato, mayo, pickle, onion) 0.75. Add cheese 0.50. Add 2 bacon 2.15.",
+        "Make it a basket with French fries and coleslaw 3.00. A local favorite."
+      ]
+    },
+    {
+      "id": "shareables",
+      "title": "Shareables",
+      "short": "Shareables",
+      "price": "5.99",
       "layout": "compact",
       "items": [
-        { "name": "Pancakes" },
-        { "name": "Blueberry" },
-        { "name": "Blackberry" },
-        { "name": "Chocolate" },
-        { "name": "Butterscotch" }
+        { "name": "Mozzarella Sticks" },
+        { "name": "Jalapeño Poppers" },
+        { "name": "Breaded Mushrooms" },
+        { "name": "Corn Nuggets" }
       ]
     },
     {
-      "id": "morning-sides",
-      "title": "On the Side",
-      "short": "A.M. Sides",
+      "id": "homestyle",
+      "title": "Homestyle Meals",
+      "short": "Homestyle",
+      "notes": ["All meals are served with two sides."],
       "items": [
-        { "name": "Fried Mush", "desc": "Cornmeal mush, sliced and fried golden.", "tag": "Hard to find" },
+        { "name": "Country Fried Steak", "price": "8.25", "desc": "Breaded country fried steak covered in sausage gravy." },
+        { "name": "Chicken Breast", "price": "8.50", "desc": "Breaded or grilled marinated chicken breast." },
+        { "name": "Breaded Chicken Strips", "price": "8.00", "desc": "Four pieces, with BBQ, ranch or honey mustard." },
+        { "name": "Fish Dinner", "price": "8.59", "desc": "Breaded Alaskan white fish with homemade tartar sauce." },
+        { "name": "Tenderloin", "price": "9.99", "tag": "Local favorite", "desc": "Grilled or hand breaded seasoned pork tenderloin." },
+        { "name": "Vegetable Plate", "price": "7.50", "desc": "Four side items and bread." }
+      ]
+    },
+    {
+      "id": "sides",
+      "title": "Sides & Extras",
+      "short": "Sides",
+      "price": "2.75",
+      "layout": "compact",
+      "items": [
+        { "name": "Mashed Potatoes & Gravy" },
+        { "name": "Green Beans" },
+        { "name": "Sliced Tomatoes" },
+        { "name": "Cottage Cheese" },
+        { "name": "Corn" },
+        { "name": "Macaroni & Cheese" },
+        { "name": "French Fries" },
+        { "name": "Potato Salad" },
+        { "name": "Pickled Beets" },
         { "name": "Home Fries" },
-        { "name": "Hash Browns" },
-        { "name": "Bacon, Sausage or Ham" },
-        { "name": "Eggs Your Way" },
-        { "name": "Toast or Cinnamon Sugar Toast" },
-        { "name": "Oatmeal" }
-      ]
-    },
-    {
-      "id": "sandwiches",
-      "title": "Sandwiches & Burgers",
-      "short": "Sandwiches",
-      "items": [
-        { "name": "Pork Tenderloin", "desc": "The Indiana classic.", "tag": "Hoosier classic" },
-        { "name": "Hamburger or Cheeseburger" },
-        { "name": "Tuna Melt" },
-        { "name": "Country Fried Steak Sandwich" },
-        { "name": "Breaded Chicken Sandwich" },
-        { "name": "Grilled Chicken Breast Sandwich" },
-        { "name": "Fish Sandwich" }
-      ]
-    },
-    {
-      "id": "plates",
-      "title": "Homestyle Plates",
-      "short": "Plates",
-      "items": [
-        { "name": "Country Fried Steak" },
-        { "name": "Grilled Chicken Breast" },
-        { "name": "Breaded Chicken Strips" },
-        { "name": "Pork Tenderloin" },
-        { "name": "Catfish" },
-        { "name": "Shrimp" }
+        { "name": "Homemade Coleslaw" },
+        { "name": "Applesauce" },
+        { "name": "Onion Rings" },
+        { "name": "Hash Rounds" },
+        { "name": "Turnip Greens" }
       ]
     },
     {
@@ -122,46 +209,49 @@
       "title": "Soups & Salads",
       "short": "Soups & Salads",
       "items": [
-        { "name": "Homemade Chili" },
-        { "name": "Vegetable Soup" },
-        { "name": "Chef Salad" }
+        { "name": "Homemade Soup", "prices": [{ "label": "Cup", "price": "2.99" }, { "label": "Bowl", "price": "4.25" }], "desc": "Chili, beef vegetable, or the soup of the day." },
+        { "name": "Grilled Chicken Salad or Chef Salad", "price": "8.00", "tag": "Local favorite", "desc": "Tomato, onion, egg and shredded cheese on fresh lettuce, with diced ham or chicken." },
+        { "name": "Side Salad", "price": "3.50" },
+        { "name": "Cup of Soup & Salad", "price": "6.25" }
       ]
     },
     {
-      "id": "sides",
-      "title": "Lunch Sides",
-      "short": "Sides",
-      "layout": "compact",
+      "id": "kids",
+      "title": "Kids Meal",
+      "short": "Kids",
+      "price": "5.75",
+      "notes": ["10 and under. Drink included."],
       "items": [
-        { "name": "Mashed Potatoes" },
-        { "name": "Green Beans" },
-        { "name": "French Fries" },
-        { "name": "Onion Rings" }
-      ]
-    },
-    {
-      "id": "sweets",
-      "title": "Pie, Cobbler & Shakes",
-      "short": "Sweets",
-      "items": [
-        { "name": "Hand-Dipped Milkshakes", "tag": "Hand-dipped" },
-        { "name": "Cream Pies" },
-        { "name": "Baked Cobblers" },
-        { "name": "Sundaes" },
-        { "name": "Ice Cream" }
-      ]
+        { "name": "Breakfast: egg, meat and toast" },
+        { "name": "Breakfast: 1 pancake and meat" },
+        { "name": "Breakfast: French toast and meat" },
+        { "name": "Breakfast: quarter biscuit and gravy with 1 egg" },
+        { "name": "Breakfast: Fluffernutter sandwich and tots" },
+        { "name": "Lunch: grilled cheese" },
+        { "name": "Lunch: 2 chicken strips" },
+        { "name": "Lunch: PB&J or Fluffernutter" },
+        { "name": "Lunch: quarter pound burger" }
+      ],
+      "extras": ["Lunch kids meals come with French fries or applesauce."]
     },
     {
       "id": "drinks",
-      "title": "Drinks",
+      "title": "Drinks & Floats",
       "short": "Drinks",
-      "layout": "compact",
       "items": [
-        { "name": "Coffee" },
-        { "name": "Iced Tea" },
-        { "name": "Coca-Cola Soft Drinks" },
-        { "name": "Juice" }
-      ]
+        { "name": "Coffee", "price": "1.89", "tag": "Free refills" },
+        { "name": "Home Brewed Iced Tea", "price": "2.89", "tag": "Free refills" },
+        { "name": "Coca-Cola", "price": "2.89", "tag": "Free refills" },
+        { "name": "Hot Chocolate or Hot Tea", "price": "2.15" },
+        { "name": "Milk or Juice", "prices": [{ "label": "Sm", "price": "2.25" }, { "label": "Lg", "price": "2.99" }] },
+        { "name": "Floats", "price": "3.89", "desc": "Red cream, vanilla cream, Dreamsicle or root beer." }
+      ],
+      "extras": ["Add vanilla or cherry flavoring to any drink for 0.30."]
     }
+  ],
+
+  "footnotes": [
+    "Prices are subject to change and quantities are limited.",
+    "Consuming raw or undercooked meats, poultry, seafood, or shellfish may increase your risk of foodborne illness."
   ]
 }

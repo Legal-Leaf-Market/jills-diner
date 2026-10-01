@@ -185,10 +185,19 @@ const favorites = (menu) => `
   </div>
 </section>`;
 
+const money = (v) => `$${esc(String(v).replace(/^\$/, ''))}`;
+
+// An item shows one price ("6.75") or several labeled ones (Cup 2.99, Bowl 4.25).
+function priceTag(i) {
+  if (i.prices?.length) {
+    const parts = i.prices.map((p) => `<span class="price-label">${t(p.label)}</span> ${money(p.price)}`).join(' <span class="price-sep" aria-hidden="true">/</span> ');
+    return `<span class="leader" aria-hidden="true"></span><span class="price">${parts}</span>`;
+  }
+  return i.price ? `<span class="leader" aria-hidden="true"></span><span class="price">${money(i.price)}</span>` : '';
+}
+
 function item(i) {
-  const price = i.price
-    ? `<span class="leader" aria-hidden="true"></span><span class="price">$${esc(String(i.price).replace(/^\$/, ''))}</span>`
-    : '';
+  const price = priceTag(i);
   return `
           <li class="item">
             <div class="item-top"><span class="item-name">${t(i.name)}</span>${i.tag ? ` <span class="tag">${t(i.tag)}</span>` : ''}${price}</div>
@@ -208,16 +217,17 @@ const menuCard = (menu, { standalone }) => `
       .map(
         (s) => `
     <section class="menu-group" id="m-${esc(s.id)}" aria-labelledby="m-${esc(s.id)}-h">
-      <h3 id="m-${esc(s.id)}-h">${t(s.title)}</h3>
-      ${s.note ? `<p class="group-note">${t(s.note)}</p>` : ''}
+      <h3 id="m-${esc(s.id)}-h"><span>${t(s.title)}</span>${s.price ? `<span class="group-price">${money(s.price)}</span>` : ''}</h3>
+      ${(s.notes ?? []).map((n) => `<p class="group-note">${t(n)}</p>`).join('')}
       <ul class="items${s.layout === 'compact' ? ' items-compact' : ''}" role="list">${s.items.map(item).join('')}
       </ul>
+      ${(s.extras ?? []).map((n) => `<p class="group-extra">${t(n)}</p>`).join('')}
     </section>`,
       )
       .join('')}
   </div>
   <div class="menu-foot">
-    <p>The menu changes now and then. If you\u2019re after something in particular, give us a call.</p>
+    <div class="menu-fine">${(menu.footnotes ?? []).map((n) => `<p>${t(n)}</p>`).join('')}</div>
     ${
       standalone
         ? `<button class="btn btn-ghost btn-sm" type="button" data-print>${icon.print}<span>Print this menu</span></button>`
@@ -230,7 +240,7 @@ const menuSection = (site, menu) => `
 <section class="menu-section" id="menu" aria-labelledby="menu-title">
   <div class="wrap">
     <header class="section-head on-red">
-      <p class="kicker">Breakfast, lunch &amp; something sweet</p>
+      <p class="kicker">Breakfast all day &amp; lunch till close</p>
       <h2 id="menu-title">The Menu</h2>
     </header>
     ${menuCard(menu, { standalone: false })}
@@ -351,7 +361,7 @@ const footer = (site, base) => {
   </div>
   <div class="wrap foot-bottom">
     <p>\u00a9 ${new Date().getFullYear()} ${t(site.name)}, Columbus, Indiana</p>
-    ${site.preview ? '<p class="preview-note">Preview site. Menu, prices and hours are still being confirmed with the diner.</p>' : ''}
+    ${site.preview ? '<p class="preview-note">Preview site made for Jill\u2019s Diner. Menu and prices from the diner\u2019s current printed menu.</p>' : ''}
   </div>
 </footer>
 <nav class="action-bar" aria-label="Quick actions">
@@ -437,7 +447,7 @@ ${header(site, '/')}
 <section class="menu-section" id="menu" aria-labelledby="menu-title">
   <div class="wrap">
     <header class="section-head on-red">
-      <p class="kicker">Breakfast, lunch &amp; something sweet</p>
+      <p class="kicker">Breakfast all day &amp; lunch till close</p>
       <h1 id="menu-title">The Menu</h1>
       <p class="menu-page-sub"><span>${t(site.address.street)}, ${t(site.address.city)}</span> <span class="sub-dot" aria-hidden="true">\u00b7</span> <a href="${links(site).tel}">${esc(site.phone)}</a></p>
     </header>

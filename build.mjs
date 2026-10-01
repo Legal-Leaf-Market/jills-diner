@@ -67,11 +67,12 @@ function check(site, menu) {
     if (!/^[a-z0-9-]+$/.test(s.id)) problems.push(`menu: section id "${s.id}" must be lowercase-with-dashes`);
     if (ids.has(s.id)) problems.push(`menu: section id "${s.id}" is used twice`);
     ids.add(s.id);
+    const priceOk = (v) => /^\$?\d+(\.\d{2})?$/.test(String(v));
+    if (s.price && !priceOk(s.price)) problems.push(`menu: "${s.title}" price "${s.price}" should look like 6.49`);
     for (const i of s.items) {
       if (!i.name) problems.push(`menu: an item in "${s.title}" has no name`);
-      if (i.price && !/^\$?\d+(\.\d{2})?$/.test(String(i.price))) {
-        problems.push(`menu: ${i.name} price "${i.price}" should look like 6.49`);
-      }
+      const all = [...(i.price ? [i.price] : []), ...(i.prices ?? []).map((p) => p.price)];
+      for (const v of all) if (!priceOk(v)) problems.push(`menu: ${i.name} price "${v}" should look like 6.49`);
     }
   }
   for (const f of menu.favorites) {

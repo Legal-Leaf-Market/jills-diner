@@ -96,6 +96,23 @@ export const art = {
   </g>
 </svg>`,
 
+  burger: `
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  <path d="M24 84h72c0 9-8 14-36 14s-36-5-36-14z" fill="#E6AD5E" ${s()}/>
+  <path d="M20 74c6-6 12 2 18-4s12 2 18-4 12 2 18-4 12 2 18-4 10 4 10 8l-2 6H22z" fill="#6DAE4E" ${s(2.5)}/>
+  <rect x="20" y="68" width="80" height="16" rx="8" fill="#7A3F22" ${s()}/>
+  <path d="M26 66h68l-6 10-8-6-8 8-8-8-8 8-8-8-8 6z" fill="#F2B632" ${s(2.5)}/>
+  <path d="M22 64c0-22 17-34 38-34s38 12 38 34z" fill="#E9B266" ${s()}/>
+  <g fill="#FFF6E2" stroke="${INK}" stroke-width="1.2">
+    <ellipse cx="44" cy="46" rx="2.6" ry="1.5" transform="rotate(-25 44 46)"/>
+    <ellipse cx="58" cy="40" rx="2.6" ry="1.5"/>
+    <ellipse cx="72" cy="46" rx="2.6" ry="1.5" transform="rotate(25 72 46)"/>
+    <ellipse cx="60" cy="54" rx="2.6" ry="1.5" transform="rotate(8 60 54)"/>
+    <ellipse cx="82" cy="54" rx="2.6" ry="1.5" transform="rotate(35 82 54)"/>
+    <ellipse cx="38" cy="56" rx="2.6" ry="1.5" transform="rotate(-35 38 56)"/>
+  </g>
+</svg>`,
+
   shake: `
 <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
   <path d="M72 44l18-34" stroke="${INK}" stroke-width="9" stroke-linecap="round"/>

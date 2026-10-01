@@ -622,7 +622,29 @@ address { font-style: normal; }
   .menu-cols { padding-inline: 16px; }
   .menu-group h3 { font-size: 21px; gap: 10px; }
 }
-.group-note { margin: -6px 0 12px; color: var(--ink-3); font-size: 15px; }
+.menu-group h3 > span:first-child { flex: 0 1 auto; min-width: 0; }
+.group-price {
+  order: 3;
+  flex: none;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+.group-note { margin: -6px 0 12px; color: var(--ink-3); font-size: 15px; line-height: 1.45; }
+.group-note + .group-note { margin-top: -8px; }
+.group-extra {
+  margin-top: 12px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--butter);
+  background: var(--paper);
+  color: var(--ink-2);
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+.group-extra + .group-extra { margin-top: 6px; }
+.price-label { font-family: var(--font-body); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+.price-sep { color: var(--ink-3); font-weight: 400; margin: 0 2px; }
+.menu-fine p + p { margin-top: 4px; }
 
 .items { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
 .item-top {
@@ -672,7 +694,7 @@ address { font-style: normal; }
   font-size: 15px;
 }
 @media (min-width: 720px) { .menu-foot { padding: 20px 40px 26px; } }
-.menu-foot p { max-width: 52ch; }
+.menu-fine { max-width: 60ch; font-size: 14px; line-height: 1.45; }
 
 .print-head { display: none; }
 
@@ -999,13 +1021,18 @@ address { font-style: normal; }
   .menu-section { background: none; padding: 0; }
   .menu-section .wrap { width: 100%; }
   .menu-card { background: none; border: 0; box-shadow: none; border-radius: 0; }
-  .menu-cols { columns: 2; column-gap: 28px; column-rule: 1px dotted #999; padding: 0; }
-  .menu-group { margin-bottom: 10px; }
-  .menu-group h3 { font-size: 13pt; margin-bottom: 4px; color: #000; }
+  .menu-cols { columns: 3; column-gap: 20px; column-rule: 1px dotted #999; padding: 0; }
+  .menu-group { margin-bottom: 8px; }
+  .menu-group h3 { font-size: 11.5pt; margin-bottom: 3px; color: #000; }
+  .group-note { font-size: 7.5pt; margin: -2px 0 3px; }
+  .group-extra { font-size: 7.5pt; margin-top: 3px; padding: 2px 6px; background: none; }
+  .price { font-size: 9pt; }
+  .price-label { font-size: 6.5pt; }
   .items { gap: 3px; }
   .items-compact { gap: 1px 12px; }
-  .item-name, .items-compact .item-name { font-size: 10pt; line-height: 1.3; }
-  .item-desc { font-size: 8.5pt; line-height: 1.3; }
+  .item-name, .items-compact .item-name { font-size: 8.5pt; line-height: 1.25; }
+  .item-desc { font-size: 7.5pt; line-height: 1.25; }
+  .items { gap: 2px; }
   .tag { border-color: #000; background: none; font-size: 6.5pt; padding: 0 6px; }
   .menu-foot { border-top: 1px solid #ccc; padding: 6px 0 0; font-size: 8.5pt; }
   .print-head { display: block !important; text-align: center; margin-bottom: 12px; font-size: 9pt; line-height: 1.4; }

@@ -1,13 +1,10 @@
 {
   "_readme": "Business facts live here and nowhere else. The page, the hours table, the open/closed badge and the Google structured data all read this file, so changing a number here changes it everywhere at once.",
-
   "name": "Jill's Diner",
   "preview": true,
   "url": "https://jills-diner.vercel.app",
-
-  "phone": "(812) 418-8970",
-  "phoneE164": "+18124188970",
-
+  "phone": "(812) 799-0016",
+  "phoneE164": "+18127990016",
   "address": {
     "street": "3005 N. National Road",
     "city": "Columbus",
@@ -15,22 +12,50 @@
     "zip": "47201",
     "landmark": "Between Rural King and Disc Replay, in the old RadioShack spot."
   },
-
   "facebook": "https://www.facebook.com/profile.php?id=100063801211216",
-
   "timezone": "America/Indiana/Indianapolis",
   "hours": [
-    { "day": "Monday", "closed": true },
-    { "day": "Tuesday", "open": "06:00", "close": "14:00" },
-    { "day": "Wednesday", "open": "06:00", "close": "14:00" },
-    { "day": "Thursday", "open": "06:00", "close": "14:00" },
-    { "day": "Friday", "open": "06:00", "close": "14:00" },
-    { "day": "Saturday", "open": "07:00", "close": "12:45" },
-    { "day": "Sunday", "open": "08:00", "close": "12:45" }
+    {
+      "day": "Monday",
+      "closed": true
+    },
+    {
+      "day": "Tuesday",
+      "open": "06:00",
+      "close": "14:00"
+    },
+    {
+      "day": "Wednesday",
+      "open": "06:00",
+      "close": "14:00"
+    },
+    {
+      "day": "Thursday",
+      "open": "06:00",
+      "close": "14:00"
+    },
+    {
+      "day": "Friday",
+      "open": "06:00",
+      "close": "14:00"
+    },
+    {
+      "day": "Saturday",
+      "open": "07:00",
+      "close": "13:00"
+    },
+    {
+      "day": "Sunday",
+      "open": "08:00",
+      "close": "13:00"
+    }
   ],
-
-  "letterboard": ["Welcome to", "our new home", "3005 N National Rd", "Coffee's on"],
-
+  "letterboard": [
+    "Welcome to",
+    "our new home",
+    "3005 N National Rd",
+    "Coffee's on"
+  ],
   "story": {
     "title": "A Columbus diner since 1952",
     "lede": "Since 1952 the names over the door have changed. The diner hasn't: eggs on the flattop, coffee in the pot, and regulars who know each other by name.",
@@ -62,6 +87,5 @@
       }
     ]
   },
-
   "regulars": "Everybody eats here: first responders, construction crews, plumbers, retirees, Bible study groups, and families with little ones in tow."
 }
