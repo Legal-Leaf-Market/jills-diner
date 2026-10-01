@@ -232,6 +232,9 @@
       actions.appendChild(button('Cancel', 'tk-cancel', function () { openCancel(o); }));
     } else {
       c.appendChild(el('p', 'ticket-final', o.status === 'completed' ? 'Picked up' : 'Cancelled'));
+      if (o.status === 'cancelled' && o.cancel_confirmed_by) {
+        c.appendChild(el('p', 'ticket-who', 'Customer told by ' + o.cancel_confirmed_by + ', ' + timeFmt.format(new Date(o.cancel_confirmed_at))));
+      }
     }
     if (actions.children.length) c.appendChild(actions);
     return c;
@@ -244,11 +247,30 @@
     return b;
   }
   // Cancelling: staff have to tell the customer first. The box shows the
-  // customer's number to call, and the cancel button stays locked until
-  // someone confirms the customer knows (by phone or in person).
+  // customer's number to call, and Cancel order stays locked until someone
+  // types their name and confirms the customer knows (by phone or in
+  // person). cancel_order() in the database is the only way to cancel, and
+  // it saves who confirmed it and when.
   var cancelBox = null;
   function closeCancel() {
     if (cancelBox) { cancelBox.remove(); cancelBox = null; }
+  }
+  function cancelOrder(id, staffName, btn) {
+    btn.disabled = true;
+    return client
+      .rpc('cancel_order', { p_order_id: id, p_staff_name: staffName })
+      .then(function (res) {
+        var row = Array.isArray(res.data) ? res.data[0] : res.data;
+        if (res.error || !row) throw res.error || new Error('not cancelled');
+        orders[id] = row;
+        draw();
+        closeCancel();
+      })
+      .catch(function (err) {
+        console.error('[dashboard] cancel failed', err);
+        btn.disabled = false;
+        alert('That didn’t save. Check the internet connection and try again.');
+      });
   }
   function openCancel(o) {
     closeCancel();
@@ -263,22 +285,30 @@
     call.appendChild(el('small', null, prettyPhone(o.customer_phone)));
     call.href = 'tel:' + o.customer_phone;
     box.appendChild(call);
+    var nameLabel = el('label', 'dash-modal-name');
+    nameLabel.appendChild(el('span', null, 'Your name'));
+    var name = document.createElement('input');
+    name.type = 'text';
+    name.maxLength = 60;
+    name.autocomplete = 'off';
+    nameLabel.appendChild(name);
+    box.appendChild(nameLabel);
     var check = document.createElement('input');
     check.type = 'checkbox';
     var label = el('label', 'dash-modal-check');
     label.appendChild(check);
     label.appendChild(el('span', null, 'I told the customer, by phone or in person'));
     box.appendChild(label);
+    var ready = function () { return check.checked && name.value.trim().length >= 2; };
     var row = el('div', 'ticket-actions');
     row.appendChild(button('Keep order', 'tk-keep', closeCancel));
     var go = button('Cancel order', 'tk-cancel armed', function (b) {
-      if (!check.checked) return;
-      setStatus(o.id, 'cancelled', b).then(function () {
-        if (orders[o.id] && orders[o.id].status === 'cancelled') closeCancel();
-      });
+      if (ready()) cancelOrder(o.id, name.value.trim(), b);
     });
     go.disabled = true;
-    check.addEventListener('change', function () { go.disabled = !check.checked; });
+    var update = function () { go.disabled = !ready(); };
+    check.addEventListener('change', update);
+    name.addEventListener('input', update);
     row.appendChild(go);
     box.appendChild(row);
     wrap.appendChild(box);
