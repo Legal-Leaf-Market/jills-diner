@@ -160,3 +160,5 @@ body.dash {
 @media (prefers-reduced-motion: reduce) {
   .ticket.is-pending, .dash-alert.go p { animation: none; }
 }
+
+.dash-alert[hidden] { display: none; }
