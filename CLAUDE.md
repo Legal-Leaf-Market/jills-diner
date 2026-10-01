@@ -35,6 +35,6 @@ free preview to pitch to the owner, Jill. See README.md for the full picture.
 ## Source of truth
 
 The menu, prices, phone (812) 799-0016 and hours (Tue to Fri 6:00 to 14:00,
-Sat 7:00 to 13:00, Sun 8:00 to 13:00, Mon closed) come from the diner's printed
+Sat 7:00 to 12:45, Sun 8:00 to 12:45 (per Google; the printed menu says 1 PM), Mon closed) come from the diner's printed
 menu, summer 2026. Jill has not yet approved the site itself, so `preview`
 stays true until she does.

@@ -35,7 +35,7 @@ Menu items take an optional `desc` (one short line), `tag` (a small badge like
 one `price` for everything in it, `notes` under its heading, and `extras` for
 add-ons.
 
-Hours use the 24-hour clock (`"06:00"`, `"14:00"`, `"13:00"`). The open/closed
+Hours use the 24-hour clock (`"06:00"`, `"14:00"`, `"12:45"`). The open/closed
 badge always uses Indiana time, wherever the visitor is.
 
 The build checks your edits and stops with a plain-English message if something
@@ -60,7 +60,8 @@ isn't `jills-diner`, update `"url"` in `content/site.json` to match.
 
 1. **Show Jill.** The menu, prices, phone number and hours now come straight
    from the diner's own printed menu (summer 2026). The phone on that menu is
-   (812) 799-0016, and Saturday and Sunday close at 1 PM. If anything has
+   (812) 799-0016, and Saturday and Sunday close at 12:45 PM (per Google; the printed
+   menu says 1 PM). If anything has
    changed since it was printed, edit `content/menu.json` or `content/site.json`.
 2. **Ask Jill about the story section.** The timeline (Gerald I. Davis in 1952,
    the Stotts, Sadie Cress, the Kramers, Jill in 2008) comes from reporting in
