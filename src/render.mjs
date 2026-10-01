@@ -604,7 +604,7 @@ export function renderDashboard({ site, assets, dashboardConfig }) {
       <div class="dash-list" data-list="accepted"><p class="dash-none">Nothing in progress.</p></div>
     </div>
     <div class="dash-col dash-col-done">
-      <h2>Done today</h2>
+      <h2>Done today <button type="button" class="dash-archive-all" data-archive-all hidden>Archive all</button></h2>
       <div class="dash-list" data-list="done"><p class="dash-none">Nothing yet today.</p></div>
     </div>
   </section>
