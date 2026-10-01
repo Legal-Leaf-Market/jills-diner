@@ -2,7 +2,7 @@
   "_readme": "Business facts live here and nowhere else. The page, the hours table, the open/closed badge and the Google structured data all read this file, so changing a number here changes it everywhere at once.",
   "name": "Jill's Diner",
   "preview": true,
-  "ordering": false,
+  "ordering": true,
   "url": "https://jills-diner.netlify.app",
   "phone": "(812) 799-0016",
   "phoneE164": "+18127990016",
